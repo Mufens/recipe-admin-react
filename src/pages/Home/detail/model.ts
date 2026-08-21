@@ -4,6 +4,11 @@ export interface RecipeStep {
   image?: string
 }
 
+export interface RecipeIngredient {
+  name: string
+  value: string
+}
+
 export interface RecipeDetail {
   id: number
   img: string
@@ -17,7 +22,7 @@ export interface RecipeDetail {
   author_name: string | null
   author_avatar: string | null
   description: string | null
-  ingredients: string[] | null
+  ingredients: RecipeIngredient[] | null
   steps: RecipeStep[] | null
   star: number
   ratio: string | null

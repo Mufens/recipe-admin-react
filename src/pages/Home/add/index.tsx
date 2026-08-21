@@ -3,22 +3,20 @@ import {
   Button,
   Card,
   Cascader,
-  Flex,
   Form,
   Input,
   InputNumber,
   message,
   Select,
-  Tag,
-  theme,
+  Switch,
+  Tooltip,
 } from 'antd'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import type { InputRef } from 'antd'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PageToolbar from '@/components/PageToolbar'
 import { useCategoryTree } from '@/hooks/useCategoryTree'
 import { createRecipe } from './api'
-import type { RecipeFormData } from './model'
+import type { RecipeIngredient, RecipeFormData } from './model'
 import './index.scss'
 
 const difficultyOptions = [
@@ -29,94 +27,117 @@ const difficultyOptions = [
   { value: '压力略大', label: '压力略大' },
 ]
 
-const tagInputStyle: React.CSSProperties = {
-  width: 180,
-  height: 32,
-  marginInlineEnd: 8,
-  verticalAlign: 'top',
-  fontSize: 14,
-}
-
-function IngredientTags() {
-  const { token } = theme.useToken()
+/** 食材行式输入组件：支持普通食材和 # 开头的小标题 */
+function IngredientRows() {
   const form = Form.useFormInstance()
-  const value = Form.useWatch('ingredients', form) as string[] | undefined
-  const tags = Array.isArray(value) ? value : []
-  const setTags = (next: string[]) => form.setFieldValue('ingredients', next)
+  const value = Form.useWatch('ingredients', form) as
+    | RecipeIngredient[]
+    | undefined
+  const list = Array.isArray(value) ? value : []
+  const setList = (next: RecipeIngredient[]) =>
+    form.setFieldValue('ingredients', next)
 
-  const [inputVisible, setInputVisible] = useState(false)
-  const [inputValue, setInputValue] = useState('')
-  const inputRef = useRef<InputRef>(null)
-
-  useEffect(() => {
-    if (inputVisible) {
-      inputRef.current?.focus()
-    }
-  }, [inputVisible])
-
-  const handleClose = (removedTag: string) => {
-    setTags(tags.filter((tag) => tag !== removedTag))
+  const handleAdd = () => {
+    setList([...list, { name: '', value: '' }])
   }
 
-  const showInput = () => {
-    setInputVisible(true)
+  const handleAddHeader = () => {
+    setList([...list, { name: '#', value: '' }])
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value)
+  const handleRemove = (index: number) => {
+    setList(list.filter((_, i) => i !== index))
   }
 
-  const handleInputConfirm = () => {
-    const trimmed = inputValue.trim()
-    if (trimmed && !tags.includes(trimmed)) {
-      setTags([...tags, trimmed])
-    }
-    setInputVisible(false)
-    setInputValue('')
+  const handleChange = (
+    index: number,
+    field: keyof RecipeIngredient,
+    val: string,
+  ) => {
+    const next = list.map((item, i) =>
+      i === index ? { ...item, [field]: val } : item,
+    )
+    setList(next)
   }
 
-  const tagPlusStyle: React.CSSProperties = {
-    height: 32,
-    background: token.colorBgContainer,
-    borderStyle: 'dashed',
-    fontSize: 14,
-    padding: '4px 12px',
+  const toggleHeader = (index: number) => {
+    const item = list[index]
+    if (!item) return
+    const isHeader = item.name.startsWith('#')
+    setList(
+      list.map((it, i) => {
+        if (i !== index) return it
+        return {
+          name: isHeader ? item.name.replace(/^#/, '') : `#${item.name}`,
+          value: isHeader ? item.value : '',
+        }
+      }),
+    )
   }
 
   return (
-    <Flex gap="small" align="center" wrap>
-      {tags.map<React.ReactNode>((tag) => (
-        <Tag
-          key={tag}
-          closable
-          style={{ userSelect: 'none', padding: '4px 12px', fontSize: 14 }}
-          onClose={(e) => {
-            e.preventDefault()
-            handleClose(tag)
-          }}
+    <div>
+      {list.map((item, index) => {
+        const isHeader = item.name.startsWith('#')
+        return (
+          <div key={index} className="add-page__list-item">
+            <div className="add-page__dynamic-row">
+              <Form.Item>
+                <Input
+                  value={isHeader ? item.name.slice(1) : item.name}
+                  onChange={(e) =>
+                    handleChange(
+                      index,
+                      'name',
+                      isHeader ? `#${e.target.value}` : e.target.value,
+                    )
+                  }
+                  placeholder={isHeader ? '小标题，如：酱料：' : '食材名称'}
+                  maxLength={100}
+                />
+              </Form.Item>
+              {!isHeader && (
+                <Form.Item>
+                  <Input
+                    value={item.value}
+                    onChange={(e) =>
+                      handleChange(index, 'value', e.target.value)
+                    }
+                    placeholder="用量，如：20克"
+                    maxLength={100}
+                  />
+                </Form.Item>
+              )}
+              <Tooltip title={isHeader ? '切换为普通食材' : '切换为小标题'}>
+                <Switch
+                  size="small"
+                  checked={isHeader}
+                  onChange={() => toggleHeader(index)}
+                  style={{ marginTop: 8, flexShrink: 0 }}
+                />
+              </Tooltip>
+              <MinusCircleOutlined
+                className="add-page__remove-icon"
+                onClick={() => handleRemove(index)}
+              />
+            </div>
+          </div>
+        )
+      })}
+      <div style={{ display: 'flex', gap: 8 }}>
+        <Button
+          type="dashed"
+          onClick={handleAdd}
+          block
+          icon={<PlusOutlined />}
         >
-          {tag}
-        </Tag>
-      ))}
-      {inputVisible ? (
-        <Input
-          ref={inputRef}
-          type="text"
-          size="small"
-          style={tagInputStyle}
-          value={inputValue}
-          onChange={handleInputChange}
-          onBlur={handleInputConfirm}
-          onPressEnter={handleInputConfirm}
-          placeholder="如：鸡蛋 2个"
-          maxLength={100}
-        />
-      ) : (
-        <Tag style={tagPlusStyle} icon={<PlusOutlined />} onClick={showInput}>
           添加食材
-        </Tag>
-      )}
-    </Flex>
+        </Button>
+        <Button type="dashed" onClick={handleAddHeader} style={{ flexShrink: 0 }}>
+          + 小标题
+        </Button>
+      </div>
+    </div>
   )
 }
 
@@ -146,7 +167,9 @@ export default function Add() {
     try {
       const payload: RecipeFormData = {
         ...values,
-        ingredients: (values.ingredients || []).filter(Boolean),
+        ingredients: (values.ingredients || []).filter(
+          (item) => item && item.name.trim(),
+        ),
         steps: (values.steps || []).filter((step) => step?.text?.trim()),
       }
       const result = await createRecipe(payload)
@@ -246,14 +269,18 @@ export default function Add() {
               name="ingredients"
               rules={[
                 {
-                  validator: (_, value: string[] | undefined) =>
-                    value && value.length > 0
+                  validator: (_, value: RecipeIngredient[] | undefined) => {
+                    const realItems = (value ?? []).filter(
+                      (item) => item?.name?.trim() && !item.name.startsWith('#'),
+                    )
+                    return realItems.length > 0
                       ? Promise.resolve()
-                      : Promise.reject(new Error('请至少添加一个食材')),
+                      : Promise.reject(new Error('请至少添加一个食材'))
+                  },
                 },
               ]}
             >
-              <IngredientTags />
+              <IngredientRows />
             </Form.Item>
           </Card>
 

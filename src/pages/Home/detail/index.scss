@@ -103,12 +103,28 @@
   }
 
   &__ingredient {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
     padding: 6px 12px;
     font-size: 14px;
     color: rgb(0 0 0 / 85%);
     background: #fafafa;
     border: 1px solid #f0f0f0;
     border-radius: 8px;
+
+    &--header {
+      width: 100%;
+      font-weight: 600;
+      color: rgb(0 0 0 / 85%);
+      background: #fffbe6;
+      border-color: #ffe58f;
+    }
+  }
+
+  &__ingredient-value {
+    flex-shrink: 0;
+    color: rgb(0 0 0 / 55%);
   }
 
   &__steps {

@@ -281,20 +281,38 @@ export default function Detail() {
       )}
 
       <Card
-        title={`食材（${ingredients.length}）`}
+        title={`食材（${ingredients.filter((i) => !i.name.startsWith('#')).length}）`}
         className="detail-page__section"
         size="small"
       >
         {ingredients.length > 0 ? (
           <ul className="detail-page__ingredients">
-            {ingredients.map((item, index) => (
-              <li
-                key={`${item}-${index}`}
-                className="detail-page__ingredient"
-              >
-                {item}
-              </li>
-            ))}
+            {ingredients.map((item, index) => {
+              const isHeader = item.name.startsWith('#')
+              if (isHeader) {
+                return (
+                  <li
+                    key={`h-${index}`}
+                    className="detail-page__ingredient detail-page__ingredient--header"
+                  >
+                    {item.name.slice(1)}
+                  </li>
+                )
+              }
+              return (
+                <li
+                  key={`${item.name}-${index}`}
+                  className="detail-page__ingredient"
+                >
+                  <span>{item.name}</span>
+                  {item.value && (
+                    <span className="detail-page__ingredient-value">
+                      {item.value}
+                    </span>
+                  )}
+                </li>
+              )
+            })}
           </ul>
         ) : (
           <Empty

@@ -6,6 +6,7 @@ import {
   Image,
   Input,
   Pagination,
+  Select,
   Space,
   Tag,
 } from 'antd'
@@ -17,7 +18,7 @@ import { type SmartColumn } from '@/components/TableToolbar'
 import { useCategoryTree } from '@/hooks/useCategoryTree'
 import { difficultyColor } from '@/utils/difficulty'
 import { imageProps, resolveMediaUrl } from '@/utils/media'
-import { exportRecipes, fetchRecipeList } from './api'
+import { exportRecipes, fetchIngredientNames, fetchRecipeList } from './api'
 import { type RecipeItem } from './model'
 import './index.scss'
 
@@ -37,13 +38,21 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string[][]>([])
   const [categoryInput, setCategoryInput] = useState<string[][]>([])
 
+  const [searchIngredients, setSearchIngredients] = useState<string[]>([])
+  const [ingredientInput, setIngredientInput] = useState<string[]>([])
+
   const { data: categoryTree = [] } = useCategoryTree()
+  const { data: ingredientOptions = [] } = useQuery({
+    queryKey: ['ingredientNames'],
+    queryFn: () => fetchIngredientNames(),
+    staleTime: 5 * 60 * 1000,
+  })
 
   const { data: listData, isFetching: loading, refetch } = useQuery({
-    queryKey: ['recipes', keyword, page, pageSize, selectedCategory, searchIds],
+    queryKey: ['recipes', keyword, page, pageSize, selectedCategory, searchIds, searchIngredients],
     queryFn: ({ signal }) =>
       fetchRecipeList(
-        { keyword, page, pageSize, categoryIds: selectedCategory, ids: searchIds },
+        { keyword, page, pageSize, categoryIds: selectedCategory, ids: searchIds, ingredients: searchIngredients },
         signal,
       ),
   })
@@ -55,6 +64,7 @@ export default function Home() {
     setKeyword(keywordInput)
     setSelectedCategory(categoryInput)
     setSearchIds(idInput)
+    setSearchIngredients(ingredientInput)
     setPage(1)
   }
 
@@ -65,6 +75,8 @@ export default function Home() {
     setCategoryInput([])
     setIdInput('')
     setSearchIds('')
+    setIngredientInput([])
+    setSearchIngredients([])
     setPage(1)
     setPageSize(25)
     setSelectedRowKeys([])
@@ -86,6 +98,7 @@ export default function Home() {
         keyword,
         ids: selectedRowKeys.map(String).join(','),
         categoryIds: selectedCategory,
+        ingredients: searchIngredients,
       })
       const url = URL.createObjectURL(blob)
       const a = Object.assign(document.createElement('a'), {
@@ -239,7 +252,7 @@ export default function Home() {
         <Form.Item label="编号">
           <Input
             allowClear
-            placeholder="多个用逗号分隔，如 11,33"
+            placeholder="多个用,英文逗号分隔"
             value={idInput}
             onChange={(e) => setIdInput(e.target.value)}
             style={{ width: 200 }}
@@ -258,6 +271,21 @@ export default function Home() {
             changeOnSelect
             placeholder="请选择分类"
             style={{ width: 320 }}
+          />
+        </Form.Item>
+        <Form.Item label="食材筛选">
+          <Select
+            mode="tags"
+            maxTagCount="responsive"
+            options={ingredientOptions.map((name) => ({ value: name, label: name }))}
+            value={ingredientInput}
+            onChange={(val) => setIngredientInput(val ?? [])}
+            allowClear
+            placeholder="输入或选择食材"
+            style={{ width: 320 }}
+            filterOption={(input, option) =>
+              (option?.label as string)?.toLowerCase().includes(input.toLowerCase()) ?? false
+            }
           />
         </Form.Item>
         <Form.Item>
@@ -296,6 +324,10 @@ export default function Home() {
             loading,
             onReload: () => void refetch(),
             storageKey: 'home-list',
+            // reload: false,      // 隐藏刷新按钮
+            // fullScreen: false,  // 关闭全屏按钮
+            // setting: false,     // 关闭列配置按钮
+            // tableToolbar={false}
           }}
           paginationNode={
             <Pagination

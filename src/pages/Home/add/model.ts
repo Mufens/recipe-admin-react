@@ -3,6 +3,11 @@ export interface RecipeStep {
   image?: string
 }
 
+export interface RecipeIngredient {
+  name: string
+  value: string
+}
+
 export interface RecipeFormData {
   img: string
   title: string
@@ -11,7 +16,7 @@ export interface RecipeFormData {
   person?: number | null
   up?: number | null
   description?: string
-  ingredients: string[]
+  ingredients: RecipeIngredient[]
   steps: RecipeStep[]
   tips?: string
   categoryPath: (string | number)[]

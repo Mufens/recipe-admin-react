@@ -7,12 +7,14 @@ export interface RecipeListParams {
   pageSize: number
   categoryIds: string[][]
   ids: string
+  ingredients: string[]
 }
 
 export interface ExportParams {
   keyword: string
   ids: string
   categoryIds: string[][]
+  ingredients: string[]
 }
 
 /** 获取菜谱列表 */
@@ -23,4 +25,9 @@ export function fetchRecipeList(params: RecipeListParams, signal?: AbortSignal) 
 /** 导出菜谱 Excel */
 export function exportRecipes(params: ExportParams) {
   return request.post<Blob>('/api/detail/export', params, { responseType: 'blob' })
+}
+
+/** 获取所有食材名称（供搜索下拉） */
+export function fetchIngredientNames() {
+  return request.get<string[]>('/api/detail/ingredient-names')
 }
