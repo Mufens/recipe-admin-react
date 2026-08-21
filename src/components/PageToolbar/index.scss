@@ -1,0 +1,13 @@
+.page-toolbar {
+  position: fixed;
+  top: 110px;
+  right: 0;
+  z-index: 999;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 32px;
+  background: rgb(255 255 255 / 80%);
+  border-radius: 16px 0 0 16px;
+  box-shadow: 0 1px 10px 0 rgb(0 0 0 / 15%);
+}

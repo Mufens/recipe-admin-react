@@ -1,0 +1,118 @@
+.table-toolbar {
+  margin-left: auto;
+
+  &__setting-items {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    line-height: 32px;
+  }
+
+  &__setting-item {
+    margin-block: 0;
+    margin-inline: 4px;
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 16px;
+    cursor: pointer;
+
+    > span {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    &:hover {
+      color: #1677ff;
+    }
+  }
+
+  &__setting {
+    width: 200px;
+  }
+
+  &__setting-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 32px;
+    padding-inline: 8px;
+  }
+
+  &__setting-reset {
+    color: #1677ff;
+    cursor: pointer;
+  }
+
+  &__setting-list {
+    max-height: 280px;
+    padding-block-start: 8px;
+    overflow: auto;
+  }
+
+  &__setting-group-title {
+    margin-block: 6px;
+    padding-inline-start: 24px;
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 12px;
+  }
+
+  &__setting-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-height: 24px;
+    padding-inline: 8px;
+
+    &:hover {
+      .table-toolbar__setting-option {
+        display: block;
+      }
+    }
+  }
+
+  &__setting-drag {
+    flex-shrink: 0;
+    margin-inline-end: 4px;
+    color: rgba(0, 0, 0, 0.45);
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &__setting-check {
+    flex: 1;
+    min-width: 0;
+    margin-inline-end: 0 !important;
+  }
+
+  &__setting-title {
+    display: inline-block;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
+
+  &__setting-option {
+    display: none;
+    float: right;
+    cursor: pointer;
+
+    > span + span {
+      margin-inline-start: 4px;
+    }
+
+    .anticon {
+      color: #1677ff;
+    }
+  }
+
+  &__setting-pin {
+    display: inline-flex;
+    cursor: pointer;
+  }
+}

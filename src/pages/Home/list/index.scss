@@ -1,0 +1,26 @@
+.home-page {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  min-height: 0;
+
+  &__search {
+    margin-bottom: 8px;
+    padding: 16px 16px 0;
+    border-radius: 6px;
+
+    .ant-form-item {
+      margin-bottom: 16px;
+    }
+  }
+
+  &__panel {
+    min-height: 0;
+    background: #fff;
+
+    &:fullscreen {
+      padding: 16px;
+      box-sizing: border-box;
+    }
+  }
+}
