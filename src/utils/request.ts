@@ -24,6 +24,10 @@ const instance: AxiosInstance = axios.create({
 })
 
 instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  // FormData 需由浏览器自动带 boundary，去掉默认 application/json
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type']
+  }
   // TODO: 注入 token
   return config
 })

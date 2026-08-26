@@ -1,14 +1,17 @@
-import { PlusCircleOutlined, UploadOutlined } from '@ant-design/icons'
+import { DeleteOutlined, ImportOutlined, PlusCircleOutlined, UploadOutlined } from '@ant-design/icons'
 import {
   Button,
   Cascader,
   Form,
   Image,
   Input,
+  Modal,
   Pagination,
+  Popconfirm,
   Select,
   Space,
   Tag,
+  message,
 } from 'antd'
 import { useMemo, useState, type Key } from 'react'
 import { useQuery } from '@tanstack/react-query'
@@ -18,7 +21,14 @@ import { type SmartColumn } from '@/components/TableToolbar'
 import { useCategoryTree } from '@/hooks/useCategoryTree'
 import { difficultyColor } from '@/utils/difficulty'
 import { imageProps, resolveMediaUrl } from '@/utils/media'
-import { exportRecipes, fetchIngredientNames, fetchRecipeList } from './api'
+import {
+  deleteRecipes,
+  exportRecipes,
+  fetchIngredientNames,
+  fetchRecipeList,
+  type SearchMode,
+} from './api'
+import BatchImportModal from './components/BatchImportModal'
 import { type RecipeItem } from './model'
 import './index.scss'
 
@@ -26,6 +36,8 @@ export default function Home() {
   const navigate = useNavigate()
 
   const [exporting, setExporting] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
   const [keyword, setKeyword] = useState('')
@@ -35,11 +47,13 @@ export default function Home() {
   const [idInput, setIdInput] = useState('')
   const [searchIds, setSearchIds] = useState('')
 
-  const [selectedCategory, setSelectedCategory] = useState<string[][]>([])
-  const [categoryInput, setCategoryInput] = useState<string[][]>([])
+  const [selectedCategory, setSelectedCategory] = useState<(string | number)[][]>([])
+  const [categoryInput, setCategoryInput] = useState<(string | number)[][]>([])
 
-  const [searchIngredients, setSearchIngredients] = useState<string[]>([])
-  const [ingredientInput, setIngredientInput] = useState<string[]>([])
+  const [searchIngredients, setSearchIngredients] = useState<number[]>([])
+  const [ingredientInput, setIngredientInput] = useState<number[]>([])
+  const [ingredientMode, setIngredientMode] = useState<SearchMode>('exact')
+  const [ingredientModeInput, setIngredientModeInput] = useState<SearchMode>('exact')
 
   const { data: categoryTree = [] } = useCategoryTree()
   const { data: ingredientOptions = [] } = useQuery({
@@ -49,10 +63,27 @@ export default function Home() {
   })
 
   const { data: listData, isFetching: loading, refetch } = useQuery({
-    queryKey: ['recipes', keyword, page, pageSize, selectedCategory, searchIds, searchIngredients],
+    queryKey: [
+      'recipes',
+      keyword,
+      page,
+      pageSize,
+      selectedCategory,
+      searchIds,
+      searchIngredients,
+      ingredientMode,
+    ],
     queryFn: ({ signal }) =>
       fetchRecipeList(
-        { keyword, page, pageSize, categoryIds: selectedCategory, ids: searchIds, ingredients: searchIngredients },
+        {
+          keyword,
+          page,
+          pageSize,
+          categoryIds: selectedCategory,
+          ids: searchIds,
+          ingredients: searchIngredients,
+          ingredientMode,
+        },
         signal,
       ),
   })
@@ -65,6 +96,7 @@ export default function Home() {
     setSelectedCategory(categoryInput)
     setSearchIds(idInput)
     setSearchIngredients(ingredientInput)
+    setIngredientMode(ingredientModeInput)
     setPage(1)
   }
 
@@ -77,6 +109,8 @@ export default function Home() {
     setSearchIds('')
     setIngredientInput([])
     setSearchIngredients([])
+    setIngredientMode('exact')
+    setIngredientModeInput('exact')
     setPage(1)
     setPageSize(25)
     setSelectedRowKeys([])
@@ -99,6 +133,7 @@ export default function Home() {
         ids: selectedRowKeys.map(String).join(','),
         categoryIds: selectedCategory,
         ingredients: searchIngredients,
+        ingredientMode,
       })
       const url = URL.createObjectURL(blob)
       const a = Object.assign(document.createElement('a'), {
@@ -114,7 +149,41 @@ export default function Home() {
     }
   }
 
-  const columns: SmartColumn<RecipeItem>[] = useMemo(
+  const handleDelete = async (ids: Key[]) => {
+    if (!ids.length) {
+      message.warning('请选择要删除的菜谱')
+      return
+    }
+    setDeleting(true)
+    try {
+      await deleteRecipes(ids)
+      message.success('删除成功')
+      const idSet = new Set(ids.map(String))
+      setSelectedRowKeys((prev) => prev.filter((k) => !idSet.has(String(k))))
+      await refetch()
+    } catch {
+      // 错误 toast 由拦截器统一处理
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const handleBatchDelete = () => {
+    if (!selectedRowKeys.length) {
+      message.warning('请先勾选要删除的菜谱')
+      return
+    }
+    Modal.confirm({
+      title: '确认删除',
+      content: `确定删除选中的 ${selectedRowKeys.length} 条菜谱吗？删除后不可恢复。`,
+      okText: '删除',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: () => handleDelete(selectedRowKeys),
+    })
+  }
+
+  const baseColumns: SmartColumn<RecipeItem>[] = useMemo(
     () => [
       {
         title: '编号',
@@ -233,6 +302,39 @@ export default function Home() {
     [],
   )
 
+  const columns: SmartColumn<RecipeItem>[] = [
+    ...baseColumns,
+    {
+      title: '操作',
+      key: 'action',
+      width: 140,
+      fixed: 'right',
+      render: (_: unknown, record) => (
+        <Space size={0}>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => navigate(`/edit?id=${record.id}`)}
+          >
+            编辑
+          </Button>
+          <Popconfirm
+            title="确认删除该菜谱？"
+            description="删除后不可恢复"
+            okText="删除"
+            okType="danger"
+            cancelText="取消"
+            onConfirm={() => void handleDelete([record.id])}
+          >
+            <Button type="link" danger size="small">
+              删除
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ]
+
   return (
     <div className="home-page">
       <Form
@@ -243,7 +345,7 @@ export default function Home() {
         <Form.Item label="菜谱名称">
           <Input
             allowClear
-            placeholder="请输入"
+            placeholder="模糊搜素"
             value={keywordInput}
             onChange={(e) => setKeywordInput(e.target.value)}
             style={{ width: 200 }}
@@ -274,19 +376,31 @@ export default function Home() {
           />
         </Form.Item>
         <Form.Item label="食材筛选">
-          <Select
-            mode="tags"
-            maxTagCount="responsive"
-            options={ingredientOptions.map((name) => ({ value: name, label: name }))}
-            value={ingredientInput}
-            onChange={(val) => setIngredientInput(val ?? [])}
-            allowClear
-            placeholder="输入或选择食材"
-            style={{ width: 320 }}
-            filterOption={(input, option) =>
-              (option?.label as string)?.toLowerCase().includes(input.toLowerCase()) ?? false
-            }
-          />
+          <Space.Compact style={{ width: 400 }}>
+            <Select
+              value={ingredientModeInput}
+              onChange={setIngredientModeInput}
+              options={[
+                { label: '精确', value: 'exact' },
+                { label: '模糊', value: 'fuzzy' },
+              ]}
+              style={{ width: 80 }}
+            />
+            <Select
+              mode="multiple"
+              maxTagCount="responsive"
+              options={ingredientOptions.map((item) => ({
+                value: item.id,
+                label: item.name,
+              }))}
+              value={ingredientInput}
+              onChange={(val) => setIngredientInput(val ?? [])}
+              allowClear
+              showSearch
+              placeholder="请选择"
+              style={{ width: 320 }}
+            />
+          </Space.Compact>
         </Form.Item>
         <Form.Item>
           <Space>
@@ -305,13 +419,28 @@ export default function Home() {
           toolbar={
             <>
               <Button
+                type="primary"
                 icon={<PlusCircleOutlined />}
                 onClick={() => void handleAdd()}
               >
                 新增
               </Button>
               <Button
-                type="primary"
+                icon={<ImportOutlined />}
+                onClick={() => setImportOpen(true)}
+              >
+                批量导入
+              </Button>
+              <Button
+                danger
+                icon={<DeleteOutlined />}
+                loading={deleting}
+                disabled={!selectedRowKeys.length}
+                onClick={handleBatchDelete}
+              >
+                删除
+              </Button>
+              <Button
                 icon={<UploadOutlined />}
                 loading={exporting}
                 onClick={() => void handleExport()}
@@ -324,10 +453,6 @@ export default function Home() {
             loading,
             onReload: () => void refetch(),
             storageKey: 'home-list',
-            // reload: false,      // 隐藏刷新按钮
-            // fullScreen: false,  // 关闭全屏按钮
-            // setting: false,     // 关闭列配置按钮
-            // tableToolbar={false}
           }}
           paginationNode={
             <Pagination
@@ -353,6 +478,15 @@ export default function Home() {
           scroll={{ x: 'max-content' }}
         />
       </div>
+
+      <BatchImportModal
+        open={importOpen}
+        onCancel={() => setImportOpen(false)}
+        onSuccess={() => {
+          setImportOpen(false)
+          void refetch()
+        }}
+      />
     </div>
   )
 }

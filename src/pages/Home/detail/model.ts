@@ -29,6 +29,8 @@ export interface RecipeDetail {
   tips: string | null
   tag_id: number | null
   category_id: string | null
+  /** good_item 关联的二级分类 id */
+  sub_category_id?: string | null
   tag_name: string | null
   cat_name: string | null
   subcat_name: string | null

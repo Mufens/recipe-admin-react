@@ -1,0 +1,73 @@
+.batch-import-modal {
+  .ant-modal-body {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  &__dragger {
+    .ant-upload-drag {
+      border: 1px dashed #d9d9d9;
+      border-radius: 8px;
+      background: #fafafa;
+      .ant-upload {
+        padding: 36px 18px;
+      }
+    }
+
+    .ant-upload-btn {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: auto !important;
+      min-height: 140px;
+    }
+
+    .ant-upload-drag-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  &__icon {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 8px;
+    padding: 0;
+    color: var(--ant-color-primary);
+    font-size: 48px;
+    line-height: 1;
+  }
+
+  &__action {
+    margin: 0 0 6px;
+    padding: 0;
+    color: var(--ant-color-primary);
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  &__hint {
+    margin: 0;
+    padding: 0;
+    color: #999;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__footer-right {
+    display: flex;
+    gap: 8px;
+  }
+}

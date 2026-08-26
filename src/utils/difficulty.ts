@@ -1,3 +1,15 @@
+/** 难度下拉选项（与库内常见值对齐） */
+export const difficultyOptions = [
+  { value: '零厨艺', label: '零厨艺' },
+  { value: '容易做', label: '容易做' },
+  { value: '简单', label: '简单' },
+  { value: '普通', label: '普通' },
+  { value: '中等', label: '中等' },
+  { value: '有点挑战', label: '有点挑战' },
+  { value: '困难', label: '困难' },
+  { value: '压力略大', label: '压力略大' },
+]
+
 /** 难度对应的 antd Tag 颜色 */
 export type DifficultyColor = 'default' | 'green' | 'orange' | 'red' | 'blue'
 
