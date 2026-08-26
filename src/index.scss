@@ -48,3 +48,39 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #eeeff2 transparent;
 }
+
+:root {
+  --rc-virtual-list-scrollbar-bg: #eeeff2;
+}
+
+[class*='-scrollbar-vertical'] {
+  width: 5px !important;
+}
+
+[class*='-scrollbar-horizontal'] {
+  height: 5px !important;
+}
+
+[class*='-scrollbar-thumb'] {
+  background: #eeeff2 !important;
+  border-radius: 2px !important;
+}
+
+[class*='-scrollbar-thumb']:hover,
+[class*='-scrollbar-thumb-moving'] {
+  background: #d9dae0 !important;
+}
+
+.ant-select-dropdown-list-scrollbar:hover {
+  background-color: transparent !important;
+}
+
+/* 图片未加载 / 失败时默认灰色底 */
+.ant-image {
+  overflow: hidden;
+  background-color: #f5f5f5;
+}
+
+.ant-image .ant-image-img {
+  background-color: #f5f5f5;
+}

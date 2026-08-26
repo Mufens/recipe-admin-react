@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 export interface CategoryOption {
-  value: string
+  value: string | number
   label: string
   children?: CategoryOption[]
 }

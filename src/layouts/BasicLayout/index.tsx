@@ -1,6 +1,7 @@
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  SwapOutlined,
   TableOutlined,
   UnorderedListOutlined,
   UserOutlined,
@@ -20,6 +21,11 @@ const menuItems = [
     key: '/home',
     icon: <UnorderedListOutlined />,
     label: '菜谱列表',
+  },
+  {
+    key: '/convert',
+    icon: <SwapOutlined />,
+    label: '格式转换',
   },
   {
     key: '/access',
@@ -63,6 +69,9 @@ export default function BasicLayout() {
     if (location.pathname === '/detail') {
       const id = new URLSearchParams(location.search).get('id')
       items.push({ title: id ? `菜谱详情 ${id}` : meta.title })
+    } else if (location.pathname === '/edit') {
+      const id = new URLSearchParams(location.search).get('id')
+      items.push({ title: id ? `编辑菜谱 ${id}` : meta.title })
     } else {
       items.push({ title: meta.title })
     }

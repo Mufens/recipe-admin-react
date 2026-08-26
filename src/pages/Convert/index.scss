@@ -1,0 +1,65 @@
+.convert-page {
+  height: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  overflow: auto;
+
+  &__panel {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px;
+    background: #fff;
+    border-radius: 8px;
+  }
+
+  &__title {
+    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f1f1f;
+  }
+
+  &__desc {
+    margin: 0 0 20px;
+    color: #666;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  &__dragger {
+    .ant-upload-drag {
+      border-radius: 8px;
+      padding: 28px 16px;
+      background: #fafafa;
+    }
+  }
+
+  &__icon {
+    margin-bottom: 8px;
+    color: #1677ff;
+    font-size: 42px;
+    line-height: 1;
+  }
+
+  &__action {
+    margin: 0 0 6px;
+    color: #1677ff;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  &__hint {
+    margin: 0;
+    color: #999;
+    font-size: 13px;
+  }
+
+  &__actions {
+    margin-top: 20px;
+  }
+
+  &__label {
+    color: #333;
+    font-size: 14px;
+  }
+}
