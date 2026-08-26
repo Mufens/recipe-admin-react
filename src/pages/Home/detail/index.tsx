@@ -197,12 +197,11 @@ export default function Detail() {
             </Title>
 
             <div className="detail-page__meta">
-              {recipe.cat_name && (
-                <Tag color="blue">{recipe.cat_name}</Tag>
-              )}
-              {recipe.tag_name && (
-                <Tag color="purple">{recipe.tag_name}</Tag>
-              )}
+              {(recipe.tags ?? []).map((t) => (
+                <Tag key={t.id || t.name} color="purple">
+                  {t.path_label || t.name}
+                </Tag>
+              ))}
               {recipe.difficulty && (
                 <Tag
                   color={difficultyColor(recipe.difficulty)}
@@ -256,11 +255,10 @@ export default function Detail() {
 
         <Descriptions column={{ xs: 1, sm: 2, md: 4 }} size="small">
           <Descriptions.Item label="菜谱 ID">{recipe.id}</Descriptions.Item>
-          <Descriptions.Item label="一级分类">
-            {recipe.cat_name || '-'}
-          </Descriptions.Item>
-          <Descriptions.Item label="特色分类">
-            {recipe.tag_name || '-'}
+          <Descriptions.Item label="分类标签" span={3}>
+            {recipe.tags?.length
+              ? recipe.tags.map((t) => t.path_label || t.name).join('；')
+              : '-'}
           </Descriptions.Item>
           <Descriptions.Item label="难度">
             {recipe.difficulty || '-'}

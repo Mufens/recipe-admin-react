@@ -13,13 +13,15 @@ export interface RecipeFormData {
   title: string
   use_time?: string
   difficulty?: string
-  person?: number | null
   up?: number | null
   description?: string
+  author_name?: string
+  author_avatar?: string
   ingredients: RecipeIngredient[]
   steps: RecipeStep[]
   tips?: string
-  categoryPath: (string | number)[]
+  /** 多条分类路径 */
+  categoryPaths: (string | number)[][]
 }
 
 export interface CreateRecipeResult {

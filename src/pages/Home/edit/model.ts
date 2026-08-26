@@ -13,7 +13,7 @@ export interface RecipeEditFormData {
   difficulty?: string
   ingredients: RecipeIngredient[]
   steps: RecipeStep[]
-  categoryPath: (string | number)[]
+  categoryPaths: (string | number)[][]
 }
 
 export interface UpdateRecipePayload extends RecipeEditFormData {

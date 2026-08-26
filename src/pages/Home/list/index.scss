@@ -4,6 +4,12 @@
   height: 100%;
   min-height: 0;
 
+  &:fullscreen {
+    box-sizing: border-box;
+    padding: 16px;
+    background: #fff;
+  }
+
   &__search {
     margin-bottom: 8px;
     padding: 16px 16px 0;
@@ -17,10 +23,5 @@
   &__panel {
     min-height: 0;
     background: #fff;
-
-    &:fullscreen {
-      padding: 16px;
-      box-sizing: border-box;
-    }
   }
 }

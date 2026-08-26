@@ -51,7 +51,12 @@ export default function IngredientRows() {
   }
 
   return (
-    <div>
+    <div className="ingredient-rows">
+      <div className="ingredient-rows__toolbar">
+        <Button type="dashed" onClick={handleAdd} icon={<PlusOutlined />}>
+          添加食材
+        </Button>
+      </div>
       {list.map((item, index) => {
         const isHeader = item.name.startsWith('#')
         return (
@@ -99,9 +104,6 @@ export default function IngredientRows() {
           </div>
         )
       })}
-      <Button type="dashed" onClick={handleAdd} block icon={<PlusOutlined />}>
-        添加食材
-      </Button>
     </div>
   )
 }

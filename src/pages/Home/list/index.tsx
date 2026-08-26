@@ -13,7 +13,7 @@ import {
   Tag,
   message,
 } from 'antd'
-import { useMemo, useState, type Key } from 'react'
+import { useMemo, useRef, useState, type Key } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
 import SmartTable from '@/components/SmartTable'
@@ -34,6 +34,7 @@ import './index.scss'
 
 export default function Home() {
   const navigate = useNavigate()
+  const pageRef = useRef<HTMLDivElement>(null)
 
   const [exporting, setExporting] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
@@ -201,7 +202,7 @@ export default function Home() {
         title: '封面',
         key: 'img',
         dataIndex: 'img',
-        width: 100,
+        width: 120,
         render: (img: string) => (
           <Image
             width={80}
@@ -223,40 +224,29 @@ export default function Home() {
         ),
       },
       {
-        title: '一级分类',
-        key: 'cat_name',
-        dataIndex: 'cat_name',
-        width: 100,
-        render: (val: string | null) => {
-          if (!val) return '-'
-          return <Tag color="blue">{val}</Tag>
-        },
-      },
-      {
-        title: '二级分类',
-        key: 'subcat_name',
-        dataIndex: 'subcat_name',
-        width: 100,
-        render: (val: string | null) => {
-          if (!val) return '-'
-          return <Tag color="cyan">{val}</Tag>
-        },
-      },
-      {
-        title: '三级分类',
-        key: 'tag_name',
-        dataIndex: 'tag_name',
-        width: 100,
-        render: (val: string | null) => {
-          if (!val) return '-'
-          return <Tag color="purple">{val}</Tag>
+        title: '分类标签',
+        key: 'tags',
+        dataIndex: 'tags',
+        width: 280,
+        render: (_: unknown, record) => {
+          const tags = record.tags ?? []
+          if (!tags.length) return '-'
+          return (
+            <Space size={[4, 4]} wrap>
+              {tags.map((t) => (
+                <Tag key={t.id || t.name} color="purple">
+                  {t.path_label || t.name}
+                </Tag>
+              ))}
+            </Space>
+          )
         },
       },
       {
         title: '作者',
         key: 'author_name',
         dataIndex: 'author_name',
-        width: 100,
+        width: 150,
         ellipsis: true,
         render: (name: string, record) => (
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -278,7 +268,7 @@ export default function Home() {
         title: '难度',
         key: 'difficulty',
         dataIndex: 'difficulty',
-        width: 80,
+        width: 100,
         render: (val: string | null) => {
           if (!val) return '-'
           return <Tag color={difficultyColor(val)}>{val}</Tag>
@@ -336,7 +326,7 @@ export default function Home() {
   ]
 
   return (
-    <div className="home-page">
+    <div ref={pageRef} className="home-page">
       <Form
         className="home-page__search"
         layout="inline"
@@ -371,7 +361,7 @@ export default function Home() {
             }}
             allowClear
             changeOnSelect
-            placeholder="请选择分类"
+            placeholder="请选择"
             style={{ width: 320 }}
           />
         </Form.Item>
@@ -453,6 +443,7 @@ export default function Home() {
             loading,
             onReload: () => void refetch(),
             storageKey: 'home-list',
+            fullscreenTargetRef: pageRef,
           }}
           paginationNode={
             <Pagination

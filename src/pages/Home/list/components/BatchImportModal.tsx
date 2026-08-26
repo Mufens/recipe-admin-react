@@ -82,6 +82,7 @@ export default function BatchImportModal({
       title="批量导入"
       open={open}
       onCancel={handleClose}
+      mask={{ closable: false }}
       destroyOnHidden
       width={400}
       footer={

@@ -18,7 +18,7 @@ import { useCategoryTree } from '@/hooks/useCategoryTree'
 import { difficultyOptions } from '@/utils/difficulty'
 import { fetchRecipeDetail } from '../detail/api'
 import IngredientRows from '../components/IngredientRows'
-import { resolveCategoryPath } from '../utils/categoryPath'
+import { resolveCategoryPaths } from '../utils/categoryPath'
 import { updateRecipe } from './api'
 import type { RecipeEditFormData, RecipeIngredient } from './model'
 import '../add/index.scss'
@@ -54,11 +54,10 @@ export default function Edit() {
       difficulty: recipe.difficulty || undefined,
       ingredients: ingredients.length ? ingredients : [{ name: '', value: '' }],
       steps: steps.length ? steps : [{ text: '', image: '' }],
-      categoryPath: resolveCategoryPath(
+      categoryPaths: resolveCategoryPaths(
         categoryTree,
+        recipe.tags,
         recipe.category_id,
-        recipe.tag_id,
-        recipe.sub_category_id,
       ),
     })
   }, [recipe, categoryTree, form])
@@ -76,7 +75,7 @@ export default function Edit() {
         id: Number(id),
         use_time: values.use_time,
         difficulty: values.difficulty,
-        categoryPath: values.categoryPath || [],
+        categoryPaths: values.categoryPaths || [],
         ingredients: (values.ingredients || []).filter(
           (item) => item && item.name.trim(),
         ),
@@ -156,11 +155,17 @@ export default function Edit() {
             className="add-page__section"
             size="small"
           >
-            <Form.Item name="categoryPath" label="分类（一级 / 特色）">
+            <Form.Item
+              name="categoryPaths"
+              label="分类标签"
+              extra="可多选"
+            >
               <Cascader
+                multiple
+                maxTagCount="responsive"
                 options={categoryTree}
                 changeOnSelect
-                placeholder="请选择一级分类或特色分类"
+                placeholder="请选择一条或多条分类路径"
                 style={{ width: '100%' }}
               />
             </Form.Item>

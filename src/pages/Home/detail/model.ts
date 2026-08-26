@@ -9,6 +9,12 @@ export interface RecipeIngredient {
   value: string
 }
 
+export interface RecipeTag {
+  id: number
+  name: string
+  path_label?: string
+}
+
 export interface RecipeDetail {
   id: number
   img: string
@@ -27,11 +33,7 @@ export interface RecipeDetail {
   star: number
   ratio: string | null
   tips: string | null
-  tag_id: number | null
+  /** 列表浏览桶；编辑回退用 */
   category_id: string | null
-  /** good_item 关联的二级分类 id */
-  sub_category_id?: string | null
-  tag_name: string | null
-  cat_name: string | null
-  subcat_name: string | null
+  tags: RecipeTag[]
 }

@@ -1,3 +1,9 @@
+export interface RecipeTag {
+  id: number
+  name: string
+  path_label?: string
+}
+
 export interface RecipeItem {
   id: number
   img: string
@@ -7,11 +13,9 @@ export interface RecipeItem {
   star: number
   author_name: string
   author_avatar: string | null
-  tag_id: number | null
+  /** 列表浏览桶 */
   category_id: string | null
-  tag_name: string | null
-  cat_name: string | null
-  subcat_name: string | null
+  tags: RecipeTag[]
 }
 
 export interface RecipeListResult {

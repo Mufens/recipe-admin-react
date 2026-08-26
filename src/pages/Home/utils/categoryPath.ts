@@ -1,38 +1,48 @@
 import type { CategoryOption } from '@/api/category'
 
-type PathValue = string | number
+export type PathValue = string | number
+
+export interface RecipeTagView {
+  id: number
+  name: string
+  path_label?: string
+}
 
 /**
- * 根据菜谱已有的一级分类 / 特色分类，在分类树中还原 Cascader 路径
- * 例：category_id=b, sub_category_id=bb, tag_id=312 → ["b","bb",312]
+ * 根据叶子 tagId 在分类树中还原 Cascader 单条路径
+ * 例：tagId=312 → ["b","bb",312]
  */
-export function resolveCategoryPath(
+export function resolvePathByTagId(
   tree: CategoryOption[],
-  categoryId: string | null | undefined,
-  tagId: number | null | undefined,
-  subCategoryId?: string | null,
+  tagId: number,
 ): PathValue[] {
-  if (tagId != null) {
-    for (const cat of tree) {
-      for (const mid of cat.children || []) {
-        const midChildren = mid.children || []
-        if (!midChildren.length && mid.value === tagId) {
-          return [cat.value, tagId]
-        }
-        for (const item of midChildren) {
-          if (item.value === tagId) {
-            return [cat.value, mid.value, tagId]
-          }
+  for (const cat of tree) {
+    for (const mid of cat.children || []) {
+      const midChildren = mid.children || []
+      if (!midChildren.length && mid.value === tagId) {
+        return [cat.value, tagId]
+      }
+      for (const item of midChildren) {
+        if (item.value === tagId) {
+          return [cat.value, mid.value, tagId]
         }
       }
     }
-    if (categoryId && subCategoryId) {
-      return [categoryId, subCategoryId, tagId]
-    }
-    if (categoryId) return [categoryId, tagId]
-    return [tagId]
   }
+  return [tagId]
+}
 
-  if (categoryId) return [categoryId]
+/** 多标签 → Cascader 多路径 */
+export function resolveCategoryPaths(
+  tree: CategoryOption[],
+  tags: RecipeTagView[] | null | undefined,
+  fallbackCategoryId?: string | null,
+): PathValue[][] {
+  const paths = (Array.isArray(tags) ? tags : [])
+    .filter((t) => t?.id != null)
+    .map((t) => resolvePathByTagId(tree, t.id))
+
+  if (paths.length) return paths
+  if (fallbackCategoryId) return [[fallbackCategoryId]]
   return []
 }

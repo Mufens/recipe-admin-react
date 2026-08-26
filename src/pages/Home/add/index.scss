@@ -101,3 +101,16 @@
     padding: 12px 24px;
   }
 }
+
+.ingredient-rows {
+  &__toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    background: #fff;
+  }
+}

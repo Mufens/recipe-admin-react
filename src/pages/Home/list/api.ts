@@ -2,8 +2,6 @@ import request from '@/utils/request'
 import type { RecipeListResult } from './model'
 
 export type SearchMode = 'exact' | 'fuzzy'
-/** @deprecated 使用 SearchMode */
-export type IngredientMode = SearchMode
 
 export interface RecipeListParams {
   keyword: string

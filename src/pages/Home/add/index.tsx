@@ -30,7 +30,7 @@ export default function Add() {
     () => ({
       ingredients: [],
       steps: [{ text: '' }],
-      categoryPath: [],
+      categoryPaths: [],
     }),
     [],
   )
@@ -47,6 +47,7 @@ export default function Add() {
     try {
       const payload: RecipeFormData = {
         ...values,
+        categoryPaths: values.categoryPaths || [],
         ingredients: (values.ingredients || []).filter(
           (item) => item && item.name.trim(),
         ),
@@ -94,11 +95,17 @@ export default function Add() {
               />
             </Form.Item>
 
-            <Form.Item name="categoryPath" label="分类">
+            <Form.Item
+              name="categoryPaths"
+              label="分类标签"
+              extra="可多选。例：水产海鲜/虾/基围虾 + 特色分类/口味/辣"
+            >
               <Cascader
+                multiple
+                maxTagCount="responsive"
                 options={categoryTree}
                 changeOnSelect
-                placeholder="请选择分类"
+                placeholder="请选择一条或多条分类路径"
                 style={{ width: '100%' }}
               />
             </Form.Item>
@@ -116,12 +123,20 @@ export default function Add() {
               </Form.Item>
             </div>
 
+            <Form.Item name="up" label="份数">
+              <InputNumber min={0} placeholder="0" style={{ width: '100%' }} />
+            </Form.Item>
+
             <div className="add-page__row">
-              <Form.Item name="person" label="做过人数" className="add-page__col">
-                <InputNumber min={0} placeholder="0" style={{ width: '100%' }} />
+              <Form.Item name="author_name" label="作者名" className="add-page__col">
+                <Input placeholder="请输入作者名" maxLength={50} showCount />
               </Form.Item>
-              <Form.Item name="up" label="份数" className="add-page__col">
-                <InputNumber min={0} placeholder="0" style={{ width: '100%' }} />
+              <Form.Item
+                name="author_avatar"
+                label="作者头像 URL"
+                className="add-page__col"
+              >
+                <Input placeholder="请输入作者头像 URL" maxLength={500} />
               </Form.Item>
             </div>
 
