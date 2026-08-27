@@ -1,0 +1,116 @@
+.category-page {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 12px;
+  height: 100%;
+  min-height: 0;
+  padding: 4px;
+
+  &__aside,
+  &__main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+    background: #fff;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+  }
+
+  &__aside-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f1f1f;
+
+    &::before {
+      content: '';
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+      background: #1677ff;
+    }
+  }
+
+  &__aside-filter {
+    padding: 0 12px 10px;
+  }
+
+  &__tree {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding: 0 8px 12px;
+
+    .ant-tree-node-selected,
+    .ant-tree-node-content-wrapper.ant-tree-node-selected {
+      background: #e6f4ff !important;
+    }
+  }
+
+  &__tree-state {
+    display: flex;
+    justify-content: center;
+    padding: 24px 0;
+  }
+
+  &__main-head {
+    padding: 12px 16px 0;
+    flex-shrink: 0;
+  }
+
+  &__crumb {
+    min-height: 22px;
+    margin-bottom: 15px;
+    color: #8c8c8c;
+    font-size: 13px;
+
+    button {
+      padding: 0;
+      height: auto;
+      color: #595959;
+    }
+
+    button.is-active {
+      color: #1f1f1f;
+      font-weight: 600;
+      cursor: default;
+    }
+  }
+
+  &__search {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin-bottom: 12px;
+  }
+
+  &__search-label {
+    color: rgba(0, 0, 0, 0.88);
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  &__table-panel {
+    flex: 1;
+    min-height: 0;
+    padding: 0 8px 8px;
+    display: flex;
+    flex-direction: column;
+
+    .smart-table {
+      flex: 1;
+      min-height: 0;
+    }
+  }
+
+  &__name-link {
+    padding: 0;
+    height: auto;
+    color: #1677ff;
+  }
+}

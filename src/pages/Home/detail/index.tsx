@@ -116,7 +116,7 @@ export default function Detail() {
   const error = queryError || (!loading && !recipe)
 
   const handleRefresh = useCallback(() => void refetch(), [refetch])
-  const handleBack = useCallback(() => navigate('/home'), [navigate])
+  const handleBack = useCallback(() => navigate('/recipe/list'), [navigate])
 
   if (!id) {
     return (
@@ -128,7 +128,7 @@ export default function Detail() {
             title="缺少菜谱 ID"
             subTitle="请从列表页点击「详情」进入，或检查 URL 是否包含 ?id= 参数"
             extra={
-              <Button type="link" onClick={() => navigate('/home')}>
+              <Button type="link" onClick={() => navigate('/recipe/list')}>
                 返回列表
               </Button>
             }
@@ -161,7 +161,7 @@ export default function Detail() {
             title="加载失败"
             subTitle="未找到该菜谱或接口异常"
             extra={
-              <Button type="link" onClick={() => navigate('/home')}>
+              <Button type="link" onClick={() => navigate('/recipe/list')}>
                 返回列表
               </Button>
             }

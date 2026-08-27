@@ -20,7 +20,7 @@ export interface RecipeFormData {
   ingredients: RecipeIngredient[]
   steps: RecipeStep[]
   tips?: string
-  /** 多条分类路径 */
+  /** 多条分类路径；叶子 tag 为正整数 number，一级/二级为 string */
   categoryPaths: (string | number)[][]
 }
 

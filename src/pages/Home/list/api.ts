@@ -7,6 +7,7 @@ export interface RecipeListParams {
   keyword: string
   page: number
   pageSize: number
+  /** 分类筛选路径；叶子 tag 为正整数 number */
   categoryIds: (string | number)[][]
   ids: string
   /** 标准食材 id 列表 */
@@ -17,6 +18,7 @@ export interface RecipeListParams {
 export interface ExportParams {
   keyword: string
   ids: string
+  /** 分类筛选路径；叶子 tag 为正整数 number */
   categoryIds: (string | number)[][]
   ingredients: number[]
   ingredientMode: SearchMode

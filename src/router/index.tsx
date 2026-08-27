@@ -8,13 +8,35 @@ import Add from '@/pages/Home/add'
 import Detail from '@/pages/Home/detail'
 import Edit from '@/pages/Home/edit'
 import Home from '@/pages/Home/list'
+import CategoryPage from '@/pages/Category'
+import UserList from '@/pages/User/list'
 import TableDemo from '@/pages/Table'
 
-function KeepAliveHome() {
+function KeepAliveRecipeList() {
   return (
     <div style={{ height: '100%' }}>
-      <KeepAlive name="/home">
+      <KeepAlive name="/recipe/list">
         <Home />
+      </KeepAlive>
+    </div>
+  )
+}
+
+function KeepAliveCategories() {
+  return (
+    <div style={{ height: '100%' }}>
+      <KeepAlive name="/categories">
+        <CategoryPage />
+      </KeepAlive>
+    </div>
+  )
+}
+
+function KeepAliveUsers() {
+  return (
+    <div style={{ height: '100%' }}>
+      <KeepAlive name="/users">
+        <UserList />
       </KeepAlive>
     </div>
   )
@@ -50,7 +72,7 @@ function EditPage() {
 function KeepAliveAdd() {
   return (
     <div style={{ height: '100%' }}>
-      <KeepAlive name="/add">
+      <KeepAlive name="/recipe/add">
         <Add />
       </KeepAlive>
     </div>
@@ -73,16 +95,18 @@ export default function AppRouter() {
       path: '/',
       element: <BasicLayout />,
       children: [
-        { index: true, element: <Navigate to="/home" replace /> },
-        { path: 'home', element: <KeepAliveHome /> },
+        { index: true, element: <Navigate to="/recipe/list" replace /> },
+        { path: 'recipe/list', element: <KeepAliveRecipeList /> },
+        { path: 'recipe/edit', element: <EditPage /> },
+        { path: 'recipe/add', element: <KeepAliveAdd /> },
+        { path: 'categories', element: <KeepAliveCategories /> },
+        { path: 'users', element: <KeepAliveUsers /> },
         { path: 'detail', element: <KeepAliveDetail /> },
-        { path: 'edit', element: <EditPage /> },
-        { path: 'add', element: <KeepAliveAdd /> },
         { path: 'convert', element: <KeepAliveConvert /> },
         { path: 'access', element: <Access /> },
         { path: 'table', element: <TableDemo /> },
       ],
     },
-    { path: '*', element: <Navigate to="/home" replace /> },
+    { path: '*', element: <Navigate to="/recipe/list" replace /> },
   ])
 }

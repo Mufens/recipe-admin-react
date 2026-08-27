@@ -11,18 +11,14 @@ export interface RouteMeta {
   active?: string
 }
 
-/** 首页标签，初始化时使用 */
-export const HOME_TAG: TagItem = {
-  path: '/home',
-  title: '菜谱列表',
-}
-
 /** 路由 path → 页面元信息 */
 export const routeMetaMap: Record<string, RouteMeta> = {
-  '/home': { title: '菜谱列表', parent: '菜谱管理' },
-  '/detail': { title: '菜谱详情', parent: '菜谱列表', active: '/home' },
-  '/edit': { title: '编辑菜谱', parent: '菜谱列表', active: '/home' },
-  '/add': { title: '新增菜谱', parent: '菜谱列表', active: '/home' },
+  '/recipe/list': { title: '菜谱列表', parent: '菜谱管理' },
+  '/categories': { title: '分类管理', parent: '菜谱管理' },
+  '/users': { title: '用户管理', parent: '系统管理' },
+  '/recipe/detail': { title: '菜谱详情', parent: '菜谱列表', active: '/recipe/list' },
+  '/recipe/edit': { title: '编辑菜谱', parent: '菜谱列表', active: '/recipe/list' },
+  '/recipe/add': { title: '新增菜谱', parent: '菜谱列表', active: '/recipe/list' },
   '/convert': { title: '格式转换', parent: '菜谱管理' },
   '/access': { title: '权限演示', parent: '菜谱管理' },
   '/table': { title: 'CRUD 示例', parent: '菜谱管理' },
@@ -35,7 +31,7 @@ export const routeTitleMap: Record<string, string> = Object.fromEntries(
 
 /** 统一获取详情/编辑页的唯一 key（供 tag 去重和激活判断共用） */
 function getScopedPath(pathname: string, search: string): string {
-  if (pathname === '/detail' || pathname === '/edit') {
+  if (pathname === '/recipe/detail' || pathname === '/recipe/edit') {
     const id = new URLSearchParams(search).get('id')
     if (id) return `${pathname}?id=${id}`
   }
@@ -49,13 +45,13 @@ export function resolveTagFromLocation(
 ): TagItem | null {
   const key = getScopedPath(pathname, search)
 
-  if (pathname === '/detail') {
+  if (pathname === '/recipe/detail') {
     const id = new URLSearchParams(search).get('id')
     if (!id) return null
     return { path: key, title: `菜谱详情 ${id}` }
   }
 
-  if (pathname === '/edit') {
+  if (pathname === '/recipe/edit') {
     const id = new URLSearchParams(search).get('id')
     if (!id) return null
     return { path: key, title: `编辑菜谱 ${id}` }

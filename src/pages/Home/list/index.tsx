@@ -15,12 +15,13 @@ import {
 } from 'antd'
 import { useMemo, useRef, useState, type Key } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import SmartTable from '@/components/SmartTable'
 import { type SmartColumn } from '@/components/TableToolbar'
 import { useCategoryTree } from '@/hooks/useCategoryTree'
 import { difficultyColor } from '@/utils/difficulty'
 import { imageProps, resolveMediaUrl } from '@/utils/media'
+import { resolvePathByTagId } from '../utils/categoryPath'
 import {
   deleteRecipes,
   exportRecipes,
@@ -32,8 +33,14 @@ import BatchImportModal from './components/BatchImportModal'
 import { type RecipeItem } from './model'
 import './index.scss'
 
+export type HomeLocationState = {
+  filterTagId?: number
+  filterNonce?: number
+}
+
 export default function Home() {
   const navigate = useNavigate()
+  const location = useLocation()
   const pageRef = useRef<HTMLDivElement>(null)
 
   const [exporting, setExporting] = useState(false)
@@ -62,6 +69,28 @@ export default function Home() {
     queryFn: () => fetchIngredientNames(),
     staleTime: 5 * 60 * 1000,
   })
+
+  // 分类管理「关联菜谱」跳转：带 filterTagId 进入 → 写入分类筛选
+  const locState = (location.state || {}) as HomeLocationState
+  const filterTagId = locState.filterTagId
+  const filterNonce = locState.filterNonce
+  const tagFilterPath = useMemo(() => {
+    if (filterTagId == null || !categoryTree.length) return null
+    return resolvePathByTagId(categoryTree, filterTagId)
+  }, [filterTagId, categoryTree])
+  const [appliedNonce, setAppliedNonce] = useState<number | null>(null)
+  if (
+    filterTagId != null &&
+    filterNonce != null &&
+    tagFilterPath &&
+    filterNonce !== appliedNonce
+  ) {
+    setAppliedNonce(filterNonce)
+    setCategoryInput([tagFilterPath])
+    setSelectedCategory([tagFilterPath])
+    setSelectedRowKeys([])
+    setPage(1)
+  }
 
   const { data: listData, isFetching: loading, refetch } = useQuery({
     queryKey: [
@@ -123,7 +152,7 @@ export default function Home() {
   }
 
   const handleAdd = () => {
-    navigate('/add')
+    navigate('/recipe/add')
   }
 
   const handleExport = async () => {
@@ -304,7 +333,7 @@ export default function Home() {
           <Button
             type="link"
             size="small"
-            onClick={() => navigate(`/edit?id=${record.id}`)}
+            onClick={() => navigate(`/recipe/edit?id=${record.id}`)}
           >
             编辑
           </Button>
@@ -386,7 +415,7 @@ export default function Home() {
               value={ingredientInput}
               onChange={(val) => setIngredientInput(val ?? [])}
               allowClear
-              showSearch
+              showSearch={{ optionFilterProp: 'label' }}
               placeholder="请选择"
               style={{ width: 320 }}
             />

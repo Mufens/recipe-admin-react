@@ -11,18 +11,23 @@ import {
 } from 'antd'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import PageToolbar from '@/components/PageToolbar'
 import { useCategoryTree } from '@/hooks/useCategoryTree'
+import { useCloseCurrentTag } from '@/hooks/useCloseCurrentTag'
 import { difficultyOptions } from '@/utils/difficulty'
 import IngredientRows, {
   type RecipeIngredient,
 } from '../components/IngredientRows'
 import { createRecipe } from './api'
 import type { RecipeFormData } from './model'
+import { categoryPathsMaxRule } from '../utils/categoryPath'
 import './index.scss'
 
 export default function Add() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const closeCurrentTag = useCloseCurrentTag()
   const [form] = Form.useForm<RecipeFormData>()
   const [submitting, setSubmitting] = useState(false)
 
@@ -37,7 +42,7 @@ export default function Add() {
 
   const { data: categoryTree = [] } = useCategoryTree()
 
-  const handleBack = () => navigate('/home')
+  const handleBack = () => navigate('/recipe/list')
 
   const handleSave = async () => {
     const values = await form.validateFields().catch(() => null)
@@ -53,9 +58,11 @@ export default function Add() {
         ),
         steps: (values.steps || []).filter((step) => step?.text?.trim()),
       }
-      const result = await createRecipe(payload)
+      await createRecipe(payload)
+      await queryClient.invalidateQueries({ queryKey: ['recipes'] })
+      await queryClient.invalidateQueries({ queryKey: ['ingredientNames'] })
       message.success('创建成功')
-      navigate(`/detail?id=${result.id}`)
+      closeCurrentTag()
     } catch {
       // 错误 toast 由拦截器统一处理
     } finally {
@@ -98,14 +105,15 @@ export default function Add() {
             <Form.Item
               name="categoryPaths"
               label="分类标签"
-              extra="可多选。例：水产海鲜/虾/基围虾 + 特色分类/口味/辣"
+              extra="可多选，最多 5 个。例：水产海鲜/虾/基围虾"
+              rules={[categoryPathsMaxRule]}
             >
               <Cascader
                 multiple
                 maxTagCount="responsive"
                 options={categoryTree}
-                changeOnSelect
-                placeholder="请选择一条或多条分类路径"
+                showCheckedStrategy={Cascader.SHOW_CHILD}
+                placeholder="请选择分类标签"
                 style={{ width: '100%' }}
               />
             </Form.Item>

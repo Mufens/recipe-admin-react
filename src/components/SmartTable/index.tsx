@@ -33,8 +33,7 @@ export type TableToolbarOptions = {
 export type SmartTableProps<T extends object = object> = TableProps<T> & {
   toolbar?: ReactNode
   paginationNode?: ReactNode
-  /** false 隐藏工具栏；对象或省略则显示（列设置/刷新/全屏） */
-  tableToolbar?: TableToolbarOptions | false
+    tableToolbar?: TableToolbarOptions | false
 }
 
 export default function SmartTable<T extends object>({
@@ -56,9 +55,10 @@ export default function SmartTable<T extends object>({
   )
   const col = useColumnSetting<T>(normalizedColumns, opts?.storageKey)
 
+  const resizable = hideChrome ? false : (opts?.resizable ?? true)
   const displayColumns = useResizableColumns(
     col.displayColumns,
-    opts?.resizable ?? true,
+    resizable,
     wrapRef,
   )
 

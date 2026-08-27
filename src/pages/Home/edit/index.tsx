@@ -15,10 +15,11 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import PageToolbar from '@/components/PageToolbar'
 import { useCategoryTree } from '@/hooks/useCategoryTree'
+import { useCloseCurrentTag } from '@/hooks/useCloseCurrentTag'
 import { difficultyOptions } from '@/utils/difficulty'
 import { fetchRecipeDetail } from '../detail/api'
 import IngredientRows from '../components/IngredientRows'
-import { resolveCategoryPaths } from '../utils/categoryPath'
+import { resolveCategoryPaths, categoryPathsMaxRule } from '../utils/categoryPath'
 import { updateRecipe } from './api'
 import type { RecipeEditFormData, RecipeIngredient } from './model'
 import '../add/index.scss'
@@ -26,6 +27,7 @@ import '../add/index.scss'
 export default function Edit() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const closeCurrentTag = useCloseCurrentTag()
   const [searchParams] = useSearchParams()
   const id = searchParams.get('id')
   const [form] = Form.useForm<RecipeEditFormData>()
@@ -54,15 +56,11 @@ export default function Edit() {
       difficulty: recipe.difficulty || undefined,
       ingredients: ingredients.length ? ingredients : [{ name: '', value: '' }],
       steps: steps.length ? steps : [{ text: '', image: '' }],
-      categoryPaths: resolveCategoryPaths(
-        categoryTree,
-        recipe.tags,
-        recipe.category_id,
-      ),
+      categoryPaths: resolveCategoryPaths(categoryTree, recipe.tags),
     })
   }, [recipe, categoryTree, form])
 
-  const handleBack = () => navigate('/home')
+  const handleBack = () => navigate('/recipe/list')
 
   const handleSave = async () => {
     if (!id) return
@@ -85,7 +83,7 @@ export default function Edit() {
       await queryClient.invalidateQueries({ queryKey: ['recipes'] })
       await queryClient.invalidateQueries({ queryKey: ['ingredientNames'] })
       message.success('保存成功')
-      navigate(`/detail?id=${id}`)
+      closeCurrentTag()
     } catch {
       // 错误 toast 由拦截器统一处理
     } finally {
@@ -158,14 +156,14 @@ export default function Edit() {
             <Form.Item
               name="categoryPaths"
               label="分类标签"
-              extra="可多选"
+              rules={[categoryPathsMaxRule]}
             >
               <Cascader
                 multiple
                 maxTagCount="responsive"
                 options={categoryTree}
-                changeOnSelect
-                placeholder="请选择一条或多条分类路径"
+                showCheckedStrategy={Cascader.SHOW_CHILD}
+                placeholder="请选择,最多5个"
                 style={{ width: '100%' }}
               />
             </Form.Item>

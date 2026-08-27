@@ -1,8 +1,10 @@
 import {
+  AppstoreOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   SwapOutlined,
   TableOutlined,
+  TeamOutlined,
   UnorderedListOutlined,
   UserOutlined,
 } from '@ant-design/icons'
@@ -18,9 +20,19 @@ const { Header, Sider, Content } = Layout
 
 const menuItems = [
   {
-    key: '/home',
+    key: '/recipe/list',
     icon: <UnorderedListOutlined />,
     label: '菜谱列表',
+  },
+  {
+    key: '/categories',
+    icon: <AppstoreOutlined />,
+    label: '分类管理',
+  },
+  {
+    key: '/users',
+    icon: <TeamOutlined />,
+    label: '用户管理',
   },
   {
     key: '/convert',
@@ -60,7 +72,12 @@ export default function BasicLayout() {
 
     const items: { title: ReactNode }[] = []
     if (meta.parent) {
-      const parentPath = meta.parent === '菜谱列表' ? '/home' : '/home'
+      const parentPath =
+        meta.parent === '菜谱列表'
+          ? '/recipe/list'
+          : meta.parent === '系统管理'
+            ? '/users'
+            : '/recipe/list'
       items.push({
         title: <Link to={parentPath}>{meta.parent}</Link>,
       })
@@ -69,7 +86,7 @@ export default function BasicLayout() {
     if (location.pathname === '/detail') {
       const id = new URLSearchParams(location.search).get('id')
       items.push({ title: id ? `菜谱详情 ${id}` : meta.title })
-    } else if (location.pathname === '/edit') {
+    } else if (location.pathname === '/recipe/edit') {
       const id = new URLSearchParams(location.search).get('id')
       items.push({ title: id ? `编辑菜谱 ${id}` : meta.title })
     } else {
