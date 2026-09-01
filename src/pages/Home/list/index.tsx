@@ -251,7 +251,7 @@ export default function Home() {
         width: 80,
         fixed: 'left',
         render: (id: number) => (
-          <Link to={`/detail?id=${id}`} style={{ textDecoration: 'none' }}>
+          <Link to={`/recipe/detail?id=${id}`} style={{ textDecoration: 'none' }}>
             {id}
           </Link>
         ),

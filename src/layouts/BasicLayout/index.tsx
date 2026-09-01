@@ -83,7 +83,7 @@ export default function BasicLayout() {
       })
     }
 
-    if (location.pathname === '/detail') {
+    if (location.pathname === '/recipe/detail') {
       const id = new URLSearchParams(location.search).get('id')
       items.push({ title: id ? `菜谱详情 ${id}` : meta.title })
     } else if (location.pathname === '/recipe/edit') {

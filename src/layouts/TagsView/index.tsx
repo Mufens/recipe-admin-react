@@ -68,7 +68,7 @@ const DraggableTag = memo(function DraggableTag({
   // 拖拽中高频变化时才重建 style，非拖拽时缓存避免子组件 diff
   const style: CSSProperties = useMemo(
     () => ({
-      cursor: isDragging ? 'grabbing' : 'grab',
+      cursor: 'pointer',
       transform: transform ? `translate3d(${transform.x}px, 0, 0)` : undefined,
       transition: isDragging ? 'unset' : transition,
       zIndex: isDragging ? 1 : undefined,

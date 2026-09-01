@@ -45,7 +45,7 @@ function KeepAliveUsers() {
 function KeepAliveDetail() {
   const [searchParams] = useSearchParams()
   const id = searchParams.get('id')
-  const name = id ? `/detail?id=${id}` : '/detail'
+  const name = id ? `/recipe/detail?id=${id}` : '/recipe/detail'
   return (
     <div style={{ height: '100%' }}>
       <KeepAlive name={name} id={id || undefined}>
@@ -97,11 +97,11 @@ export default function AppRouter() {
       children: [
         { index: true, element: <Navigate to="/recipe/list" replace /> },
         { path: 'recipe/list', element: <KeepAliveRecipeList /> },
+        { path: 'recipe/detail', element: <KeepAliveDetail /> },
         { path: 'recipe/edit', element: <EditPage /> },
         { path: 'recipe/add', element: <KeepAliveAdd /> },
         { path: 'categories', element: <KeepAliveCategories /> },
         { path: 'users', element: <KeepAliveUsers /> },
-        { path: 'detail', element: <KeepAliveDetail /> },
         { path: 'convert', element: <KeepAliveConvert /> },
         { path: 'access', element: <Access /> },
         { path: 'table', element: <TableDemo /> },
