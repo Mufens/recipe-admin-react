@@ -51,8 +51,52 @@
 
   &__pagination {
     display: flex;
+    align-items: center;
     justify-content: flex-end;
-    padding-top: 16px;
+    gap: 16px;
+    padding-top: 12px;
+
+    &.has-selection {
+      justify-content: space-between;
+    }
+  }
+
+  &__selection {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  &__selection-text {
+    color: #606266;
+  }
+
+  &__selection-clear {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #409eff;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      color: #409eff;
+    }
+
+    &:disabled {
+      color: #c0c4cc;
+      cursor: not-allowed;
+    }
+  }
+
+  &__pagination-right {
+    display: flex;
+    justify-content: flex-end;
+    min-width: 0;
   }
 
   /* 非固定列补 relative；固定列 sticky 已可作定位上下文 */

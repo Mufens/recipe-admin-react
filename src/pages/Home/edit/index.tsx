@@ -160,7 +160,6 @@ export default function Edit() {
             >
               <Cascader
                 multiple
-                maxTagCount="responsive"
                 options={categoryTree}
                 showCheckedStrategy={Cascader.SHOW_CHILD}
                 placeholder="请选择,最多5个"

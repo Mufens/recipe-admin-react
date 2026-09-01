@@ -2,6 +2,7 @@ import { DeleteOutlined, ImportOutlined, PlusCircleOutlined, UploadOutlined } fr
 import {
   Button,
   Cascader,
+  DatePicker,
   Form,
   Image,
   Input,
@@ -13,13 +14,15 @@ import {
   Tag,
   message,
 } from 'antd'
+import type { Dayjs } from 'dayjs'
 import { useMemo, useRef, useState, type Key } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import QueryFilter from '@/components/QueryFilter'
 import SmartTable from '@/components/SmartTable'
 import { type SmartColumn } from '@/components/TableToolbar'
 import { useCategoryTree } from '@/hooks/useCategoryTree'
-import { difficultyColor } from '@/utils/difficulty'
+import { difficultyColor, difficultyOptions } from '@/utils/difficulty'
 import { imageProps, resolveMediaUrl } from '@/utils/media'
 import { resolvePathByTagId } from '../utils/categoryPath'
 import {
@@ -62,6 +65,13 @@ export default function Home() {
   const [ingredientInput, setIngredientInput] = useState<number[]>([])
   const [ingredientMode, setIngredientMode] = useState<SearchMode>('exact')
   const [ingredientModeInput, setIngredientModeInput] = useState<SearchMode>('exact')
+  const [difficulty, setDifficulty] = useState('')
+  const [difficultyInput, setDifficultyInput] = useState<string | undefined>()
+  const [createTimeFrom, setCreateTimeFrom] = useState('')
+  const [createTimeTo, setCreateTimeTo] = useState('')
+  const [createTimeRangeInput, setCreateTimeRangeInput] = useState<
+    [Dayjs, Dayjs] | null
+  >(null)
 
   const { data: categoryTree = [] } = useCategoryTree()
   const { data: ingredientOptions = [] } = useQuery({
@@ -102,6 +112,9 @@ export default function Home() {
       searchIds,
       searchIngredients,
       ingredientMode,
+      difficulty,
+      createTimeFrom,
+      createTimeTo,
     ],
     queryFn: ({ signal }) =>
       fetchRecipeList(
@@ -113,6 +126,9 @@ export default function Home() {
           ids: searchIds,
           ingredients: searchIngredients,
           ingredientMode,
+          difficulty,
+          createTimeFrom,
+          createTimeTo,
         },
         signal,
       ),
@@ -127,6 +143,11 @@ export default function Home() {
     setSearchIds(idInput)
     setSearchIngredients(ingredientInput)
     setIngredientMode(ingredientModeInput)
+    setDifficulty(difficultyInput || '')
+    setCreateTimeFrom(
+      createTimeRangeInput?.[0]?.format('YYYY-MM-DD') || '',
+    )
+    setCreateTimeTo(createTimeRangeInput?.[1]?.format('YYYY-MM-DD') || '')
     setPage(1)
   }
 
@@ -141,6 +162,11 @@ export default function Home() {
     setSearchIngredients([])
     setIngredientMode('exact')
     setIngredientModeInput('exact')
+    setDifficulty('')
+    setDifficultyInput(undefined)
+    setCreateTimeFrom('')
+    setCreateTimeTo('')
+    setCreateTimeRangeInput(null)
     setPage(1)
     setPageSize(25)
     setSelectedRowKeys([])
@@ -164,6 +190,9 @@ export default function Home() {
         categoryIds: selectedCategory,
         ingredients: searchIngredients,
         ingredientMode,
+        difficulty,
+        createTimeFrom,
+        createTimeTo,
       })
       const url = URL.createObjectURL(blob)
       const a = Object.assign(document.createElement('a'), {
@@ -231,7 +260,9 @@ export default function Home() {
         title: '封面',
         key: 'img',
         dataIndex: 'img',
-        width: 120,
+        width: 96,
+        align: 'center',
+        onCell: () => ({ className: 'home-page__cover-cell' }),
         render: (img: string) => (
           <Image
             width={80}
@@ -275,7 +306,7 @@ export default function Home() {
         title: '作者',
         key: 'author_name',
         dataIndex: 'author_name',
-        width: 150,
+        width: 170,
         ellipsis: true,
         render: (name: string, record) => (
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -317,6 +348,13 @@ export default function Home() {
         width: 100,
         sorter: (a, b) => a.star - b.star,
       },
+      {
+        title: '创建时间',
+        key: 'create_time',
+        dataIndex: 'create_time',
+        width: 180,
+        render: (val: string | null) => val || '-',
+      },
     ],
     [],
   )
@@ -356,18 +394,13 @@ export default function Home() {
 
   return (
     <div ref={pageRef} className="home-page">
-      <Form
-        className="home-page__search"
-        layout="inline"
-        onFinish={handleSearch}
-      >
+      <QueryFilter row={2} onFinish={handleSearch} onReset={handleReset}>
         <Form.Item label="菜谱名称">
           <Input
             allowClear
-            placeholder="模糊搜素"
+            placeholder="模糊搜索"
             value={keywordInput}
             onChange={(e) => setKeywordInput(e.target.value)}
-            style={{ width: 200 }}
           />
         </Form.Item>
         <Form.Item label="编号">
@@ -376,13 +409,13 @@ export default function Home() {
             placeholder="多个用,英文逗号分隔"
             value={idInput}
             onChange={(e) => setIdInput(e.target.value)}
-            style={{ width: 200 }}
           />
         </Form.Item>
         <Form.Item label="分类筛选">
           <Cascader
             multiple
             maxTagCount="responsive"
+            maxTagPlaceholder={(omitted) => `+${omitted.length}`}
             options={categoryTree}
             value={categoryInput}
             onChange={(val) => {
@@ -391,11 +424,10 @@ export default function Home() {
             allowClear
             changeOnSelect
             placeholder="请选择"
-            style={{ width: 320 }}
           />
         </Form.Item>
         <Form.Item label="食材筛选">
-          <Space.Compact style={{ width: 400 }}>
+          <Space.Compact>
             <Select
               value={ingredientModeInput}
               onChange={setIngredientModeInput}
@@ -403,11 +435,12 @@ export default function Home() {
                 { label: '精确', value: 'exact' },
                 { label: '模糊', value: 'fuzzy' },
               ]}
-              style={{ width: 80 }}
+              style={{ width: 72 }}
             />
             <Select
               mode="multiple"
               maxTagCount="responsive"
+              maxTagPlaceholder={(omitted) => `+${omitted.length}`}
               options={ingredientOptions.map((item) => ({
                 value: item.id,
                 label: item.name,
@@ -417,21 +450,34 @@ export default function Home() {
               allowClear
               showSearch={{ optionFilterProp: 'label' }}
               placeholder="请选择"
-              style={{ width: 320 }}
             />
           </Space.Compact>
         </Form.Item>
-        <Form.Item>
-          <Space>
-            <Button htmlType="button" onClick={handleReset}>
-              重置
-            </Button>
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-          </Space>
+        <Form.Item label="难度">
+          <Select
+            allowClear
+            showSearch={{ optionFilterProp: 'label' }}
+            placeholder="请选择"
+            options={difficultyOptions}
+            value={difficultyInput}
+            onChange={(val) => setDifficultyInput(val)}
+          />
         </Form.Item>
-      </Form>
+        <Form.Item label="创建时间">
+          <DatePicker.RangePicker
+            allowClear
+            value={createTimeRangeInput}
+            onChange={(dates: [Dayjs | null, Dayjs | null] | null) => {
+              setCreateTimeRangeInput(
+                dates && dates[0] && dates[1]
+                  ? [dates[0], dates[1]]
+                  : null,
+              )
+            }}
+            placeholder={['开始日期', '结束日期']}
+          />
+        </Form.Item>
+      </QueryFilter>
 
       <div className="home-page__panel">
         <SmartTable<RecipeItem>

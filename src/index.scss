@@ -84,3 +84,9 @@ body {
 .ant-image .ant-image-img {
   background-color: #f5f5f5;
 }
+
+/* link 按钮去掉左右内边距，相邻操作项用右边距隔开 */
+.ant-btn.ant-btn-link {
+  padding-inline: 0 !important;
+  margin-inline-end: 10px;
+}

@@ -1,8 +1,9 @@
 .user-page {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto minmax(240px, 1fr);
   height: 100%;
   min-height: 0;
+  overflow-y: auto;
 
   &:fullscreen {
     box-sizing: border-box;

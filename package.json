@@ -34,6 +34,7 @@
     "@tanstack/react-query": "^5.101.4",
     "antd": "^6.4.3",
     "axios": "^1.17.0",
+    "dayjs": "^1.11.23",
     "react": "^19.2.6",
     "react-activation": "^0.13.4",
     "react-dom": "^19.2.6",

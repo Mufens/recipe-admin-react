@@ -1,13 +1,39 @@
 import { Avatar, Form, Input, Pagination, Space, Button } from 'antd'
 import { useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { UserOutlined } from '@ant-design/icons'
+import {
+  EyeInvisibleOutlined,
+  EyeOutlined,
+  UserOutlined,
+} from '@ant-design/icons'
 import SmartTable from '@/components/SmartTable'
 import { type SmartColumn } from '@/components/TableToolbar'
 import { resolveMediaUrl } from '@/utils/media'
 import { fetchUserList } from './api'
 import { type UserItem } from './model'
 import './index.scss'
+
+function maskPhone(phone: string) {
+  if (phone.length < 7) return phone
+  return `${phone.slice(0, 3)}****${phone.slice(-4)}`
+}
+
+function PhoneCell({ phone }: { phone: string | null | undefined }) {
+  const [visible, setVisible] = useState(false)
+  if (!phone) return <span>-</span>
+  return (
+    <Space size={4}>
+      <span>{visible ? phone : maskPhone(phone)}</span>
+      <Button
+        type="link"
+        size="small"
+        aria-label={visible ? '隐藏手机号' : '显示手机号'}
+        icon={visible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+        onClick={() => setVisible((v) => !v)}
+      />
+    </Space>
+  )
+}
 
 export default function UserList() {
   const pageRef = useRef<HTMLDivElement>(null)
@@ -49,13 +75,14 @@ export default function UserList() {
         key: 'id',
         dataIndex: 'id',
         width: 120,
+        fixed: 'left',
       },
       {
         title: '头像',
         key: 'avatar',
         dataIndex: 'avatar',
         width: 80,
-          render: (avatar: string | null) => {
+        render: (avatar: string | null) => {
           const src = resolveMediaUrl(avatar)
           return src ? (
             <Avatar size={40} src={src} />
@@ -76,7 +103,8 @@ export default function UserList() {
         title: '手机号',
         key: 'phone',
         dataIndex: 'phone',
-        width: 140,
+        width: 168,
+        render: (phone: string | null) => <PhoneCell phone={phone} />,
       },
       {
         title: '省份',

@@ -20,7 +20,7 @@ export function useTableScrollY() {
       wrap
         .querySelector('.ant-table-header')
         ?.getBoundingClientRect().height ?? FALLBACK_HEADER_H
-    setScrollY(Math.max(Math.floor(height - headerH), MIN_SCROLL_Y))
+    setScrollY(Math.max(Math.floor(height - headerH - 1), MIN_SCROLL_Y))
   }, [])
 
   useEffect(() => {
@@ -29,11 +29,7 @@ export function useTableScrollY() {
     if (!wrap) return
     const ro = new ResizeObserver(compute)
     ro.observe(wrap)
-    window.addEventListener('resize', compute)
-    return () => {
-      ro.disconnect()
-      window.removeEventListener('resize', compute)
-    }
+    return () => ro.disconnect()
   }, [compute])
 
   useActivate(compute)

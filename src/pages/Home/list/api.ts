@@ -13,6 +13,11 @@ export interface RecipeListParams {
   /** 标准食材 id 列表 */
   ingredients: number[]
   ingredientMode: SearchMode
+  difficulty: string
+  /** 创建时间起 YYYY-MM-DD */
+  createTimeFrom: string
+  /** 创建时间止 YYYY-MM-DD */
+  createTimeTo: string
 }
 
 export interface ExportParams {
@@ -22,6 +27,9 @@ export interface ExportParams {
   categoryIds: (string | number)[][]
   ingredients: number[]
   ingredientMode: SearchMode
+  difficulty: string
+  createTimeFrom: string
+  createTimeTo: string
 }
 
 export interface ImportResult {

@@ -110,7 +110,6 @@ export default function Add() {
             >
               <Cascader
                 multiple
-                maxTagCount="responsive"
                 options={categoryTree}
                 showCheckedStrategy={Cascader.SHOW_CHILD}
                 placeholder="请选择分类标签"

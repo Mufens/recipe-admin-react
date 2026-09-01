@@ -15,6 +15,8 @@ export interface RecipeItem {
   author_avatar: string | null
   /** 列表浏览桶 */
   category_id: string | null
+  /** 创建时间 YYYY-MM-DD HH:mm:ss */
+  create_time: string | null
   tags: RecipeTag[]
 }
 

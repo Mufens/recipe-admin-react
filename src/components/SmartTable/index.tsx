@@ -1,4 +1,4 @@
-import { Table } from 'antd'
+import { ConfigProvider, Table } from 'antd'
 import type { TableProps } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useMemo, useRef, type ReactNode, type RefObject } from 'react'
@@ -33,7 +33,7 @@ export type TableToolbarOptions = {
 export type SmartTableProps<T extends object = object> = TableProps<T> & {
   toolbar?: ReactNode
   paginationNode?: ReactNode
-    tableToolbar?: TableToolbarOptions | false
+  tableToolbar?: TableToolbarOptions | false
 }
 
 export default function SmartTable<T extends object>({
@@ -42,6 +42,7 @@ export default function SmartTable<T extends object>({
   tableToolbar,
   scroll,
   columns,
+  rowSelection,
   ...tableProps
 }: SmartTableProps<T>) {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -63,6 +64,12 @@ export default function SmartTable<T extends object>({
   )
 
   const showToolbar = Boolean(toolbar) || !hideChrome
+  const selectedCount = rowSelection?.selectedRowKeys?.length ?? 0
+  const showSelectionBar = Boolean(rowSelection) && Boolean(paginationNode)
+
+  const clearSelection = () => {
+    rowSelection?.onChange?.([], [], { type: 'none' })
+  }
 
   return (
     <div ref={rootRef} className="smart-table">
@@ -99,16 +106,56 @@ export default function SmartTable<T extends object>({
       ) : null}
 
       <div ref={wrapRef} className="smart-table__wrap">
-        <Table<T>
-          bordered
-          {...tableProps}
-          columns={displayColumns}
-          scroll={{ ...scroll, y: scrollY }}
-        />
+        <ConfigProvider
+          theme={{
+            components: {
+              Table: {
+                cellPaddingBlock: 10,
+                cellPaddingInline: 10,
+                cellPaddingBlockMD: 10,
+                cellPaddingInlineMD: 10,
+                cellPaddingBlockSM: 10,
+                cellPaddingInlineSM: 10,
+              },
+            },
+          }}
+        >
+          <Table<T>
+            bordered
+            {...tableProps}
+            rowSelection={rowSelection}
+            columns={displayColumns}
+            scroll={{ ...scroll, y: scrollY }}
+          />
+        </ConfigProvider>
       </div>
 
       {paginationNode ? (
-        <div className="smart-table__pagination">{paginationNode}</div>
+        <div
+          className={[
+            'smart-table__pagination',
+            showSelectionBar ? 'has-selection' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+        >
+          {showSelectionBar ? (
+            <div className="smart-table__selection">
+              <span className="smart-table__selection-text">
+                已选择：{selectedCount}
+              </span>
+              <button
+                type="button"
+                className="smart-table__selection-clear"
+                disabled={selectedCount === 0}
+                onClick={clearSelection}
+              >
+                清空
+              </button>
+            </div>
+          ) : null}
+          <div className="smart-table__pagination-right">{paginationNode}</div>
+        </div>
       ) : null}
     </div>
   )

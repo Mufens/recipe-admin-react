@@ -1,8 +1,9 @@
 .home-page {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto minmax(240px, 1fr);
   height: 100%;
   min-height: 0;
+  overflow-y: auto;
 
   &:fullscreen {
     box-sizing: border-box;
@@ -10,18 +11,20 @@
     background: #fff;
   }
 
-  &__search {
-    margin-bottom: 8px;
-    padding: 16px 16px 0;
-    border-radius: 6px;
-
-    .ant-form-item {
-      margin-bottom: 16px;
-    }
-  }
-
   &__panel {
     min-height: 0;
     background: #fff;
+  }
+
+  /* 去掉行内图片基线空隙，保证四周边距一致 */
+  &__cover-cell.ant-table-cell {
+    line-height: 0;
+    font-size: 0;
+    vertical-align: middle;
+
+    .ant-image {
+      display: block;
+      margin: 0 auto;
+    }
   }
 }
