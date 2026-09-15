@@ -13,6 +13,7 @@ export interface RecipeFormData {
   title: string
   use_time?: string
   difficulty?: string
+  ratio?: string
   up?: number | null
   description?: string
   author_name?: string

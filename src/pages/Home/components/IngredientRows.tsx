@@ -9,10 +9,8 @@ export interface RecipeIngredient {
 /** 食材行式输入：支持普通食材和 # 开头的小标题 */
 export default function IngredientRows() {
   const form = Form.useFormInstance()
-  const value = Form.useWatch('ingredients', form) as
-    | RecipeIngredient[]
-    | undefined
-  const list = Array.isArray(value) ? value : []
+  const list =
+    (Form.useWatch('ingredients', form) as RecipeIngredient[] | undefined) ?? []
   const setList = (next: RecipeIngredient[]) =>
     form.setFieldValue('ingredients', next)
 

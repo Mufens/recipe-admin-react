@@ -28,9 +28,10 @@ export const MAX_CATEGORY_TAGS = 5
 /** 分类标签最多 5 个 */
 export const categoryPathsMaxRule: Rule = {
   validator: async (_, value: PathValue[][] | undefined) => {
-    const paths = Array.isArray(value) ? value : []
+    const paths = value ?? []
     if (paths.length > MAX_CATEGORY_TAGS) {
-      throw new Error(`分类标签最多只能选择 ${MAX_CATEGORY_TAGS} 个`)    }
+      throw new Error(`分类标签最多只能选择 ${MAX_CATEGORY_TAGS} 个`)
+    }
   },
 }
 
@@ -63,8 +64,8 @@ export function resolveCategoryPaths(
   tree: CategoryOption[],
   tags: RecipeTagView[] | null | undefined,
 ): PathValue[][] {
-  return (Array.isArray(tags) ? tags : [])
-    .filter((t) => isTagId(t?.id))
+  return (tags ?? [])
+    .filter((t) => isTagId(t.id))
     .map((t) => resolvePathByTagId(tree, t.id))
     .filter((p) => isLeafCategoryPath(p))
 }

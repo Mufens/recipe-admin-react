@@ -1,28 +1,37 @@
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import {
   Button,
   Card,
-  Cascader,
   Form,
-  Input,
   Result,
-  Select,
   Spin,
   message,
 } from 'antd'
 import { useEffect, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import type { Rule } from 'antd/es/form'
 import PageToolbar from '@/components/PageToolbar'
 import { useCategoryTree } from '@/hooks/useCategoryTree'
 import { useCloseCurrentTag } from '@/hooks/useCloseCurrentTag'
-import { difficultyOptions } from '@/utils/difficulty'
 import { fetchRecipeDetail } from '../detail/api'
 import IngredientRows from '../components/IngredientRows'
-import { resolveCategoryPaths, categoryPathsMaxRule } from '../utils/categoryPath'
+import RecipeMetaFields from '../components/RecipeMetaFields'
+import StepsFormList from '../components/StepsFormList'
+import { resolveCategoryPaths } from '../utils/categoryPath'
 import { updateRecipe } from './api'
 import type { RecipeEditFormData, RecipeIngredient } from './model'
 import '../add/index.scss'
+
+const ingredientsMinRule: Rule = {
+  validator: (_, value: RecipeIngredient[] | undefined) => {
+    const realItems = (value ?? []).filter(
+      (item) => item.name.trim() && !item.name.startsWith('#'),
+    )
+    return realItems.length > 0
+      ? Promise.resolve()
+      : Promise.reject(new Error('请至少添加一个食材'))
+  },
+}
 
 export default function Edit() {
   const navigate = useNavigate()
@@ -47,13 +56,12 @@ export default function Edit() {
 
   useEffect(() => {
     if (!recipe || !categoryTree.length) return
-    const ingredients = Array.isArray(recipe.ingredients)
-      ? recipe.ingredients
-      : []
-    const steps = Array.isArray(recipe.steps) ? recipe.steps : []
+    const ingredients = recipe.ingredients ?? []
+    const steps = recipe.steps ?? []
     form.setFieldsValue({
       use_time: recipe.use_time || undefined,
       difficulty: recipe.difficulty || undefined,
+      ratio: recipe.ratio === '3/4' ? '3/4' : '16/9',
       ingredients: ingredients.length ? ingredients : [{ name: '', value: '' }],
       steps: steps.length ? steps : [{ text: '', image: '' }],
       categoryPaths: resolveCategoryPaths(categoryTree, recipe.tags),
@@ -63,9 +71,8 @@ export default function Edit() {
   const handleBack = () => navigate('/recipe/list')
 
   const handleSave = async () => {
-    if (!id) return
     const values = await form.validateFields().catch(() => null)
-    if (!values) return
+    if (!values || !id) return
 
     setSubmitting(true)
     try {
@@ -73,11 +80,10 @@ export default function Edit() {
         id: Number(id),
         use_time: values.use_time,
         difficulty: values.difficulty,
-        categoryPaths: values.categoryPaths || [],
-        ingredients: (values.ingredients || []).filter(
-          (item) => item && item.name.trim(),
-        ),
-        steps: (values.steps || []).filter((step) => step?.text?.trim()),
+        ratio: values.ratio,
+        categoryPaths: values.categoryPaths ?? [],
+        ingredients: (values.ingredients ?? []).filter((item) => item.name.trim()),
+        steps: (values.steps ?? []).filter((step) => step.text.trim()),
       })
       await queryClient.invalidateQueries({ queryKey: ['recipe', id] })
       await queryClient.invalidateQueries({ queryKey: ['recipes'] })
@@ -149,113 +155,21 @@ export default function Edit() {
       <PageToolbar onBack={handleBack} onRefresh={() => void refetch()} />
       <div className="add-page__scroll">
         <Form form={form} layout="vertical" className="add-page__form">
-          <Card
-            className="add-page__section"
-            size="small"
-          >
-            <Form.Item
-              name="categoryPaths"
-              label="分类标签"
-              rules={[categoryPathsMaxRule]}
-            >
-              <Cascader
-                multiple
-                options={categoryTree}
-                showCheckedStrategy={Cascader.SHOW_CHILD}
-                placeholder="请选择,最多5个"
-                style={{ width: '100%' }}
-              />
-            </Form.Item>
-
-            <div className="add-page__row">
-              <Form.Item
-                name="use_time"
-                label="制作时间"
-                className="add-page__col"
-              >
-                <Input placeholder="如：30分钟" maxLength={50} showCount />
-              </Form.Item>
-              <Form.Item
-                name="difficulty"
-                label="难度"
-                className="add-page__col"
-              >
-                <Select
-                  options={difficultyOptions}
-                  placeholder="请选择难度"
-                  allowClear
-                />
-              </Form.Item>
-            </div>
+          <Card className="add-page__section" size="small">
+            <RecipeMetaFields
+              categoryTree={categoryTree}
+              categoryPlaceholder="请选择,最多5个"
+            />
           </Card>
 
           <Card title="食材" className="add-page__section" size="small">
-            <Form.Item
-              name="ingredients"
-              rules={[
-                {
-                  validator: (_, value: RecipeIngredient[] | undefined) => {
-                    const realItems = (value ?? []).filter(
-                      (item) =>
-                        item?.name?.trim() && !item.name.startsWith('#'),
-                    )
-                    return realItems.length > 0
-                      ? Promise.resolve()
-                      : Promise.reject(new Error('请至少添加一个食材'))
-                  },
-                },
-              ]}
-            >
+            <Form.Item name="ingredients" rules={[ingredientsMinRule]}>
               <IngredientRows />
             </Form.Item>
           </Card>
 
           <Card title="制作步骤" className="add-page__section" size="small">
-            <Form.List name="steps">
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map((field) => (
-                    <div key={field.key} className="add-page__step-item">
-                      <Form.Item
-                        {...field}
-                        name={[field.name, 'text']}
-                        label={`步骤 ${field.name + 1}`}
-                        rules={[{ required: true, message: '请输入步骤内容' }]}
-                      >
-                        <Input.TextArea
-                          placeholder="请输入步骤内容"
-                          rows={3}
-                          maxLength={2000}
-                          showCount
-                        />
-                      </Form.Item>
-                      <Form.Item
-                        {...field}
-                        name={[field.name, 'image']}
-                        label="步骤图 URL"
-                      >
-                        <Input
-                          placeholder="请输入步骤图 URL（可选）"
-                          maxLength={500}
-                        />
-                      </Form.Item>
-                      <MinusCircleOutlined
-                        className="add-page__remove-icon add-page__remove-icon--step"
-                        onClick={() => remove(field.name)}
-                      />
-                    </div>
-                  ))}
-                  <Button
-                    type="dashed"
-                    onClick={() => add({ text: '', image: '' })}
-                    block
-                    icon={<PlusOutlined />}
-                  >
-                    添加步骤
-                  </Button>
-                </>
-              )}
-            </Form.List>
+            <StepsFormList />
           </Card>
         </Form>
       </div>

@@ -19,7 +19,6 @@ export const routeMetaMap: Record<string, RouteMeta> = {
   '/recipe/detail': { title: '菜谱详情', parent: '菜谱列表', active: '/recipe/list' },
   '/recipe/edit': { title: '编辑菜谱', parent: '菜谱列表', active: '/recipe/list' },
   '/recipe/add': { title: '新增菜谱', parent: '菜谱列表', active: '/recipe/list' },
-  '/convert': { title: '格式转换', parent: '菜谱管理' },
   '/access': { title: '权限演示', parent: '菜谱管理' },
   '/table': { title: 'CRUD 示例', parent: '菜谱管理' },
 }

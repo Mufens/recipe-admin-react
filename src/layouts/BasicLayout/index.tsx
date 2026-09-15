@@ -2,7 +2,6 @@ import {
   AppstoreOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  SwapOutlined,
   TableOutlined,
   TeamOutlined,
   UnorderedListOutlined,
@@ -33,11 +32,6 @@ const menuItems = [
     key: '/users',
     icon: <TeamOutlined />,
     label: '用户管理',
-  },
-  {
-    key: '/convert',
-    icon: <SwapOutlined />,
-    label: '格式转换',
   },
   {
     key: '/access',

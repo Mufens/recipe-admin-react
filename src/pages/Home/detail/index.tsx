@@ -9,7 +9,6 @@ import {
   Avatar,
   Button,
   Card,
-  Collapse,
   Descriptions,
   Empty,
   Image,
@@ -18,7 +17,7 @@ import {
   Tag,
   Typography,
 } from 'antd'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import PageToolbar from '@/components/PageToolbar'
@@ -30,63 +29,25 @@ import './index.scss'
 
 const { Title, Paragraph, Text } = Typography
 
-const stepPreview = (text: string) => {
-  const line = text.split('\n')[0].trim()
-  if (line.length <= 36) return line
-  return `${line.slice(0, 36)}…`
-}
-
 function RecipeSteps({
   steps,
 }: {
   steps: NonNullable<RecipeDetail['steps']>
 }) {
-  const stepKeys = useMemo(
-    () => steps.map((_, index: number) => String(index)),
-    [steps],
-  )
-  const [activeStepKeys, setActiveStepKeys] = useState<string[]>(stepKeys)
-  const allExpanded =
-    steps.length > 0 && activeStepKeys.length === steps.length
-
   return (
     <Card
       title={`制作步骤（${steps.length}）`}
       className="detail-page__section"
       size="small"
-      extra={
-        <Button
-          type="link"
-          size="small"
-          onClick={() => setActiveStepKeys(allExpanded ? [] : stepKeys)}
-        >
-          {allExpanded ? '全部收起' : '全部展开'}
-        </Button>
-      }
     >
-      <Collapse
-        className="detail-page__steps"
-        activeKey={activeStepKeys}
-        onChange={(keys) =>
-          setActiveStepKeys(Array.isArray(keys) ? keys : [keys])
-        }
-        items={steps.map((step, index) => ({
-          key: String(index),
-          label: (
-            <span className="detail-page__step-label">
-              <span className="detail-page__step-index">{index + 1}</span>
-              <span className="detail-page__step-preview">
-                {stepPreview(step.text)}
-              </span>
+      <ol className="detail-page__steps">
+        {steps.map((step, index) => (
+          <li key={index} className="detail-page__step">
+            <span className="detail-page__step-index" aria-hidden>
+              {index + 1}
             </span>
-          ),
-          children: (
-            <div>
-              <div className="detail-page__step-body">
-                <p key={index} className="detail-page__step-line">
-                  {step.text}
-                </p>
-              </div>
+            <div className="detail-page__step-main">
+              <p className="detail-page__step-text">{step.text}</p>
               {step.image ? (
                 <Image
                   src={resolveMediaUrl(step.image)}
@@ -96,9 +57,9 @@ function RecipeSteps({
                 />
               ) : null}
             </div>
-          ),
-        }))}
-      />
+          </li>
+        ))}
+      </ol>
     </Card>
   )
 }

@@ -3,7 +3,6 @@ import { Spin } from 'antd'
 import { Navigate, useRoutes, useSearchParams } from 'react-router-dom'
 import BasicLayout from '@/layouts/BasicLayout'
 import Access from '@/pages/Access'
-import Convert from '@/pages/Convert'
 import Add from '@/pages/Home/add'
 import Detail from '@/pages/Home/detail'
 import Edit from '@/pages/Home/edit'
@@ -79,16 +78,6 @@ function KeepAliveAdd() {
   )
 }
 
-function KeepAliveConvert() {
-  return (
-    <div style={{ height: '100%' }}>
-      <KeepAlive name="/convert">
-        <Convert />
-      </KeepAlive>
-    </div>
-  )
-}
-
 export default function AppRouter() {
   return useRoutes([
     {
@@ -102,7 +91,6 @@ export default function AppRouter() {
         { path: 'recipe/add', element: <KeepAliveAdd /> },
         { path: 'categories', element: <KeepAliveCategories /> },
         { path: 'users', element: <KeepAliveUsers /> },
-        { path: 'convert', element: <KeepAliveConvert /> },
         { path: 'access', element: <Access /> },
         { path: 'table', element: <TableDemo /> },
       ],
