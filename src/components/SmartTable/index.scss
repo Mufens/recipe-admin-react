@@ -3,7 +3,7 @@
   grid-template-rows: auto 1fr auto;
   height: 100%;
   min-height: 0;
-  background: #fff;
+  background: var(--ant-color-bg-container);
 
   &__toolbar {
     display: flex;
@@ -26,7 +26,7 @@
     .ant-table-body,
     .ant-table-content {
       scrollbar-width: thin;
-      scrollbar-color: #eeeff2 transparent;
+      scrollbar-color: var(--ant-color-fill-secondary) transparent;
 
       &::-webkit-scrollbar {
         width: 5px;
@@ -39,11 +39,11 @@
       }
 
       &::-webkit-scrollbar-thumb {
-        background: #eeeff2;
+        background: var(--ant-color-fill-secondary);
         border-radius: 2px;
 
         &:hover {
-          background: #d9dae0;
+          background: var(--ant-color-fill);
         }
       }
     }
@@ -71,24 +71,24 @@
   }
 
   &__selection-text {
-    color: #606266;
+    color: var(--ant-color-text-secondary);
   }
 
   &__selection-clear {
     padding: 0;
     border: 0;
     background: transparent;
-    color: #409eff;
+    color: var(--ant-color-primary);
     font-size: 14px;
     line-height: 1;
     cursor: pointer;
 
     &:hover:not(:disabled) {
-      color: #409eff;
+      color: var(--ant-color-primary-hover);
     }
 
     &:disabled {
-      color: #c0c4cc;
+      color: var(--ant-color-text-quaternary);
       cursor: not-allowed;
     }
   }

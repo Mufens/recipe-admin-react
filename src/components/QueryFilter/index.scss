@@ -8,7 +8,7 @@
   z-index: 2;
   height: var(--qf-collapsed-h);
   margin-bottom: 8px;
-  background: #fff;
+  background: var(--ant-color-bg-container);
 
   &.is-overlay {
     z-index: 20;
@@ -39,7 +39,7 @@
     height: var(--qf-collapsed-h);
     overflow: hidden;
     margin: 0;
-    background: #fff;
+    background: var(--ant-color-bg-container);
   }
 
   &.is-open &__panel {
@@ -59,9 +59,6 @@
     min-height: calc(var(--qf-collapsed-h) + var(--content-padding-top, 16px));
     padding: var(--content-padding-top, 16px) var(--content-padding-x, 20px)
       12px;
-    overflow: visible;
-    border-radius: 0;
-    box-shadow: none;
   }
 
   &__options {

@@ -10,8 +10,11 @@ import {
 import { Breadcrumb, Button, Layout, Menu, theme } from 'antd'
 import { useMemo, useState, type ReactNode } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import DarkModeToggle from '@/theme/DarkModeToggle'
+import ThemeSwitcher from '@/theme/ThemeSwitcher'
 import TagsView from '@/layouts/TagsView'
 import { routeMetaMap } from '@/router/routes'
+import { useThemeStore } from '@/store/theme'
 import logo from '@/assets/logo.svg'
 import './index.scss'
 
@@ -49,9 +52,11 @@ export default function BasicLayout() {
   const [collapsed, setCollapsed] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
+  const isDark = useThemeStore((s) => s.isDark)
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken()
+  const menuTheme = isDark ? 'dark' : 'light'
 
   const selectedKeys = useMemo(
     () => [routeMetaMap[location.pathname]?.active ?? location.pathname],
@@ -91,7 +96,13 @@ export default function BasicLayout() {
 
   return (
     <Layout className="basic-layout">
-      <Sider trigger={null} collapsible collapsed={collapsed}>
+      <Sider
+        theme={menuTheme}
+        trigger={null}
+        collapsible
+        collapsed={collapsed}
+        className="basic-layout__sider"
+      >
         <div className="basic-layout__logo">
           <img src={logo} alt="logo" className="basic-layout__logo-img" />
           {!collapsed && (
@@ -99,7 +110,7 @@ export default function BasicLayout() {
           )}
         </div>
         <Menu
-          theme="dark"
+          theme={menuTheme}
           mode="inline"
           selectedKeys={selectedKeys}
           items={menuItems}
@@ -121,6 +132,10 @@ export default function BasicLayout() {
             className="basic-layout__breadcrumb"
             items={breadcrumbItems}
           />
+          <div className="basic-layout__header-actions">
+            <DarkModeToggle />
+            <ThemeSwitcher />
+          </div>
         </Header>
         <TagsView />
         <Content

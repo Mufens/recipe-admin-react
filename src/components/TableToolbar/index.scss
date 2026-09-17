@@ -11,7 +11,7 @@
   &__setting-item {
     margin-block: 0;
     margin-inline: 4px;
-    color: rgba(0, 0, 0, 0.45);
+    color: var(--ant-color-text-secondary);
     font-size: 16px;
     cursor: pointer;
 
@@ -22,7 +22,7 @@
     }
 
     &:hover {
-      color: #1677ff;
+      color: var(--ant-color-primary);
     }
   }
 
@@ -39,7 +39,7 @@
   }
 
   &__setting-reset {
-    color: #1677ff;
+    color: var(--ant-color-primary);
     cursor: pointer;
   }
 
@@ -52,7 +52,7 @@
   &__setting-group-title {
     margin-block: 6px;
     padding-inline-start: 24px;
-    color: rgba(0, 0, 0, 0.45);
+    color: var(--ant-color-text-secondary);
     font-size: 12px;
   }
 
@@ -73,7 +73,7 @@
   &__setting-drag {
     flex-shrink: 0;
     margin-inline-end: 4px;
-    color: rgba(0, 0, 0, 0.45);
+    color: var(--ant-color-text-secondary);
     cursor: grab;
 
     &:active {
@@ -107,7 +107,7 @@
     }
 
     .anticon {
-      color: #1677ff;
+      color: var(--ant-color-primary);
     }
   }
 

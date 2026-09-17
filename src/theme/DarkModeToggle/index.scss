@@ -1,0 +1,30 @@
+@supports (view-transition-name: none) {
+  @keyframes theme-vt-keepalive {
+    100% {
+      z-index: -1;
+    }
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: theme-vt-keepalive 0.5s linear;
+    animation-fill-mode: forwards;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-old(root) {
+    z-index: 999;
+  }
+
+  ::view-transition-new(root) {
+    z-index: 1;
+  }
+
+  .dark::view-transition-old(root) {
+    z-index: 1;
+  }
+
+  .dark::view-transition-new(root) {
+    z-index: 999;
+  }
+}

@@ -75,14 +75,14 @@ body {
   background-color: transparent !important;
 }
 
-/* 图片未加载 / 失败时默认灰色底 */
+/* 图片未加载 / 失败时默认底 */
 .ant-image {
   overflow: hidden;
-  background-color: #f5f5f5;
+  background-color: var(--ant-color-fill-quaternary);
 }
 
 .ant-image .ant-image-img {
-  background-color: #f5f5f5;
+  background-color: var(--ant-color-fill-quaternary);
 }
 
 /* link 按钮去掉左右内边距，相邻操作项用右边距隔开 */
@@ -90,3 +90,15 @@ body {
   padding-inline: 0 !important;
   margin-inline-end: 10px;
 }
+
+/* Cascader：勾选/半选文字跟主题色（token 的 optionSelectedColor 只作用 active 展开项） */
+.ant-cascader-menu-item:has(.ant-cascader-checkbox-checked),
+.ant-cascader-menu-item:has(.ant-cascader-checkbox-indeterminate) {
+  color: var(--ant-color-primary);
+}
+
+/* Select：选中项文字跟主题色（提高优先级，避免被 hashed 样式盖住） */
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  color: var(--ant-color-primary) !important;
+}
+

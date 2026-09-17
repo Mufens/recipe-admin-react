@@ -61,8 +61,8 @@
     position: relative;
     padding: 12px;
     margin-bottom: 12px;
-    background: #fafafa;
-    border: 1px solid #f0f0f0;
+    background: var(--ant-color-fill-quaternary);
+    border: 1px solid var(--ant-color-border-secondary);
     border-radius: 8px;
 
     .ant-form-item {
@@ -77,12 +77,12 @@
   &__remove-icon {
     flex-shrink: 0;
     margin-top: 8px;
-    color: rgb(0 0 0 / 45%);
+    color: var(--ant-color-text-secondary);
     font-size: 16px;
     cursor: pointer;
 
     &:hover {
-      color: #ff4d4f;
+      color: var(--ant-color-error);
     }
 
     &--step {
@@ -111,6 +111,6 @@
     justify-content: flex-start;
     margin-bottom: 12px;
     padding-bottom: 8px;
-    background: #fff;
+    background: var(--ant-color-bg-container);
   }
 }

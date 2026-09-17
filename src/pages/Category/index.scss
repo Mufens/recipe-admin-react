@@ -13,8 +13,8 @@
     flex-direction: column;
     min-height: 0;
     min-width: 0;
-    background: #fff;
-    border: 1px solid #f0f0f0;
+    background: var(--ant-color-bg-container);
+    border: 1px solid var(--ant-color-border-secondary);
     border-radius: 8px;
   }
 
@@ -25,14 +25,14 @@
     padding: 14px 14px 8px;
     font-size: 15px;
     font-weight: 600;
-    color: #1f1f1f;
+    color: var(--ant-color-text);
 
     &::before {
       content: '';
       width: 3px;
       height: 14px;
       border-radius: 2px;
-      background: #1677ff;
+      background: var(--ant-color-primary);
     }
   }
 
@@ -48,7 +48,7 @@
 
     .ant-tree-node-selected,
     .ant-tree-node-content-wrapper.ant-tree-node-selected {
-      background: #e6f4ff !important;
+      background: var(--ant-color-primary-bg) !important;
       padding-left: 8px;
     }
   }
@@ -67,17 +67,17 @@
   &__crumb {
     min-height: 22px;
     margin-bottom: 15px;
-    color: #8c8c8c;
+    color: var(--ant-color-text-tertiary);
     font-size: 13px;
 
     button {
       padding: 0;
       height: auto;
-      color: #595959;
+      color: var(--ant-color-text-secondary);
     }
 
     button.is-active {
-      color: #1f1f1f;
+      color: var(--ant-color-text);
       font-weight: 600;
       cursor: default;
     }
@@ -113,6 +113,6 @@
   &__name-link {
     padding: 0;
     height: auto;
-    color: #1677ff;
+    color: var(--ant-color-primary);
   }
 }
