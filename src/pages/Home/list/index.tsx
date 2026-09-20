@@ -503,7 +503,7 @@ export default function Home() {
                 disabled={!selectedRowKeys.length}
                 onClick={handleBatchDelete}
               >
-                删除
+                批量删除
               </Button>
               <Button
                 icon={<UploadOutlined />}

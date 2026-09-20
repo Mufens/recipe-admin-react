@@ -8,6 +8,7 @@ import Detail from '@/pages/Home/detail'
 import Edit from '@/pages/Home/edit'
 import Home from '@/pages/Home/list'
 import CategoryPage from '@/pages/Category'
+import BannerPage from '@/pages/Banner'
 import UserList from '@/pages/User/list'
 import TableDemo from '@/pages/Table'
 
@@ -26,6 +27,16 @@ function KeepAliveCategories() {
     <div style={{ height: '100%' }}>
       <KeepAlive name="/categories">
         <CategoryPage />
+      </KeepAlive>
+    </div>
+  )
+}
+
+function KeepAliveBanners() {
+  return (
+    <div style={{ height: '100%' }}>
+      <KeepAlive name="/banners">
+        <BannerPage />
       </KeepAlive>
     </div>
   )
@@ -90,6 +101,7 @@ export default function AppRouter() {
         { path: 'recipe/edit', element: <EditPage /> },
         { path: 'recipe/add', element: <KeepAliveAdd /> },
         { path: 'categories', element: <KeepAliveCategories /> },
+        { path: 'banners', element: <KeepAliveBanners /> },
         { path: 'users', element: <KeepAliveUsers /> },
         { path: 'access', element: <Access /> },
         { path: 'table', element: <TableDemo /> },

@@ -1,0 +1,133 @@
+.banner-page {
+  display: grid;
+  grid-template-rows: minmax(240px, 1fr);
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+
+  &:fullscreen {
+    box-sizing: border-box;
+    padding: 16px;
+    background: var(--ant-color-bg-container);
+  }
+
+  &__panel {
+    min-height: 0;
+    background: var(--ant-color-bg-container);
+  }
+
+  &__cover-cell.ant-table-cell {
+    line-height: 0;
+    font-size: 0;
+    vertical-align: middle;
+
+    .ant-image {
+      display: block;
+    }
+  }
+
+  &__covers {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .ant-image {
+      overflow: hidden;
+      border-radius: 6px;
+    }
+  }
+
+  &__muted {
+    font-size: 12px;
+    line-height: 20px;
+    opacity: 0.55;
+  }
+}
+
+.banner-covers {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+
+  &__slots {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  &__slot,
+  &__pick {
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--ant-color-border);
+    border-radius: 8px;
+    background: var(--ant-color-bg-container);
+    cursor: pointer;
+  }
+
+  &__slot {
+    height: 108px;
+    color: var(--ant-color-text-tertiary);
+    font-size: 13px;
+
+    &.is-active {
+      border-color: var(--ant-color-primary);
+      box-shadow: 0 0 0 1px var(--ant-color-primary);
+    }
+
+    .ant-image {
+      display: block;
+      height: 100%;
+    }
+  }
+
+  &__clear {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    padding: 0 8px;
+    color: #fff;
+    font-size: 12px;
+    line-height: 22px;
+    background: rgba(0, 0, 0, 0.55);
+    border-radius: 999px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+    min-height: 180px;
+  }
+
+  &__pick {
+    text-align: left;
+
+    &.is-picked,
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+  }
+
+  &__empty,
+  &__name {
+    display: block;
+    padding: 6px 8px;
+    overflow: hidden;
+    color: var(--ant-color-text);
+    font-size: 12px;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__empty {
+    height: 84px;
+    color: var(--ant-color-text-tertiary);
+    line-height: 84px;
+    text-align: center;
+  }
+}

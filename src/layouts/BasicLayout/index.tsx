@@ -2,6 +2,7 @@ import {
   AppstoreOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  PictureOutlined,
   TableOutlined,
   TeamOutlined,
   UnorderedListOutlined,
@@ -30,6 +31,11 @@ const menuItems = [
     key: '/categories',
     icon: <AppstoreOutlined />,
     label: '分类管理',
+  },
+  {
+    key: '/banners',
+    icon: <PictureOutlined />,
+    label: '首页轮播',
   },
   {
     key: '/users',

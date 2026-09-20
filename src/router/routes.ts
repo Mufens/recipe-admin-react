@@ -15,6 +15,7 @@ export interface RouteMeta {
 export const routeMetaMap: Record<string, RouteMeta> = {
   '/recipe/list': { title: '菜谱列表', parent: '菜谱管理' },
   '/categories': { title: '分类管理', parent: '菜谱管理' },
+  '/banners': { title: '首页轮播', parent: '菜谱管理' },
   '/users': { title: '用户管理', parent: '系统管理' },
   '/recipe/detail': { title: '菜谱详情', parent: '菜谱列表', active: '/recipe/list' },
   '/recipe/edit': { title: '编辑菜谱', parent: '菜谱列表', active: '/recipe/list' },
