@@ -1,6 +1,5 @@
 import {
   Button,
-  Card,
   Form,
   Result,
   Spin,
@@ -155,22 +154,28 @@ export default function Edit() {
       <PageToolbar onBack={handleBack} onRefresh={() => void refetch()} />
       <div className="add-page__scroll">
         <Form form={form} layout="vertical" className="add-page__form">
-          <Card className="add-page__section" size="small">
-            <RecipeMetaFields
-              categoryTree={categoryTree}
-              categoryPlaceholder="请选择,最多5个"
-            />
-          </Card>
+          <section className="add-page__section">
+            <h3 className="add-page__heading">基本信息</h3>
+            <div className="add-page__grid">
+              <RecipeMetaFields
+                categoryTree={categoryTree}
+                categoryPlaceholder="请选择,最多5个"
+                categoryClassName="add-page__span-3"
+              />
+            </div>
+          </section>
 
-          <Card title="食材" className="add-page__section" size="small">
+          <section className="add-page__section">
+            <h3 className="add-page__heading">食材</h3>
             <Form.Item name="ingredients" rules={[ingredientsMinRule]}>
               <IngredientRows />
             </Form.Item>
-          </Card>
+          </section>
 
-          <Card title="制作步骤" className="add-page__section" size="small">
+          <section className="add-page__section">
+            <h3 className="add-page__heading">制作步骤</h3>
             <StepsFormList />
-          </Card>
+          </section>
         </Form>
       </div>
 

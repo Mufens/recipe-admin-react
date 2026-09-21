@@ -55,53 +55,55 @@ export default function IngredientRows() {
           添加食材
         </Button>
       </div>
-      {list.map((item, index) => {
-        const isHeader = item.name.startsWith('#')
-        return (
-          <div key={index} className="add-page__list-item">
-            <div className="add-page__dynamic-row">
-              <Form.Item>
-                <Input
-                  value={isHeader ? item.name.slice(1) : item.name}
-                  onChange={(e) =>
-                    handleChange(
-                      index,
-                      'name',
-                      isHeader ? `#${e.target.value}` : e.target.value,
-                    )
-                  }
-                  placeholder={isHeader ? '小标题，如：酱料：' : '食材名称'}
-                  maxLength={100}
-                />
-              </Form.Item>
-              {!isHeader && (
+      <div className="ingredient-rows__list">
+        {list.map((item, index) => {
+          const isHeader = item.name.startsWith('#')
+          return (
+            <div key={index} className="add-page__list-item">
+              <div className="add-page__dynamic-row">
                 <Form.Item>
                   <Input
-                    value={item.value}
+                    value={isHeader ? item.name.slice(1) : item.name}
                     onChange={(e) =>
-                      handleChange(index, 'value', e.target.value)
+                      handleChange(
+                        index,
+                        'name',
+                        isHeader ? `#${e.target.value}` : e.target.value,
+                      )
                     }
-                    placeholder="用量，如：20克"
+                    placeholder={isHeader ? '小标题，如：酱料：' : '食材名称'}
                     maxLength={100}
                   />
                 </Form.Item>
-              )}
-              <Tooltip title={isHeader ? '切换为普通食材' : '切换为小标题'}>
-                <Switch
-                  size="small"
-                  checked={isHeader}
-                  onChange={() => toggleHeader(index)}
-                  style={{ marginTop: 8, flexShrink: 0 }}
+                {!isHeader && (
+                  <Form.Item>
+                    <Input
+                      value={item.value}
+                      onChange={(e) =>
+                        handleChange(index, 'value', e.target.value)
+                      }
+                      placeholder="用量，如：20克"
+                      maxLength={100}
+                    />
+                  </Form.Item>
+                )}
+                <Tooltip title={isHeader ? '切换为普通食材' : '切换为小标题'}>
+                  <Switch
+                    size="small"
+                    checked={isHeader}
+                    onChange={() => toggleHeader(index)}
+                    style={{ marginTop: 8, flexShrink: 0 }}
+                  />
+                </Tooltip>
+                <MinusCircleOutlined
+                  className="add-page__remove-icon"
+                  onClick={() => handleRemove(index)}
                 />
-              </Tooltip>
-              <MinusCircleOutlined
-                className="add-page__remove-icon"
-                onClick={() => handleRemove(index)}
-              />
+              </div>
             </div>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
     </div>
   )
 }

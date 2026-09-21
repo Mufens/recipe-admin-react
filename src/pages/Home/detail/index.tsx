@@ -216,7 +216,7 @@ export default function Detail() {
 
         <Descriptions column={{ xs: 1, sm: 2, md: 4 }} size="small">
           <Descriptions.Item label="菜谱 ID">{recipe.id}</Descriptions.Item>
-          <Descriptions.Item label="分类标签" span={3}>
+          <Descriptions.Item label="分类标签" span={{ xs: 1, sm: 2, md: 3 }}>
             {recipe.tags?.length
               ? recipe.tags.map((t) => t.path_label || t.name).join('；')
               : '-'}
@@ -227,7 +227,7 @@ export default function Detail() {
           <Descriptions.Item label="制作时间">
             {recipe.use_time || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="收藏数">
+          <Descriptions.Item label="收藏数" span={{ xs: 1, sm: 2, md: 2 }}>
             {(recipe.star ?? 0).toLocaleString()}
           </Descriptions.Item>
         </Descriptions>

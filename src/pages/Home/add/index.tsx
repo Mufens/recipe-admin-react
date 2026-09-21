@@ -1,6 +1,5 @@
 import {
   Button,
-  Card,
   Form,
   Input,
   InputNumber,
@@ -14,7 +13,10 @@ import PageToolbar from '@/components/PageToolbar'
 import { useCategoryTree } from '@/hooks/useCategoryTree'
 import { useCloseCurrentTag } from '@/hooks/useCloseCurrentTag'
 import IngredientRows from '../components/IngredientRows'
-import RecipeMetaFields from '../components/RecipeMetaFields'
+import {
+  CategoryFormItem,
+  RecipeSpecFields,
+} from '../components/RecipeMetaFields'
 import StepsFormList from '../components/StepsFormList'
 import { createRecipe } from './api'
 import type { RecipeFormData, RecipeIngredient } from './model'
@@ -82,78 +84,67 @@ export default function Add() {
           initialValues={INITIAL_VALUES}
           className="add-page__form"
         >
-          <Card title="基础信息" className="add-page__section" size="small">
-            <Form.Item
-              name="title"
-              label="菜谱名称"
-              rules={[{ required: true, message: '请输入菜谱名称' }]}
-            >
-              <Input placeholder="请输入菜谱名称" maxLength={100} showCount />
-            </Form.Item>
-
-            <Form.Item
-              name="img"
-              label="封面图 URL"
-              rules={[{ required: true, message: '请输入封面图 URL' }]}
-            >
-              <Input.TextArea
-                placeholder="请输入封面图 URL"
-                rows={2}
-                maxLength={500}
-                showCount
+          <section className="add-page__section">
+            <h3 className="add-page__heading">基本信息</h3>
+            <div className="add-page__grid">
+              <Form.Item
+                name="title"
+                label="菜谱名称"
+                rules={[{ required: true, message: '请输入菜谱名称' }]}
+              >
+                <Input placeholder="请输入菜谱名称" maxLength={100} showCount />
+              </Form.Item>
+              <CategoryFormItem
+                categoryTree={categoryTree}
+                extra="可多选，最多 5 个"
               />
-            </Form.Item>
-
-            <RecipeMetaFields
-              categoryTree={categoryTree}
-              categoryExtra="可多选，最多 5 个。例：水产海鲜/虾/基围虾"
-            />
-
-            <Form.Item name="up" label="份数">
-              <InputNumber min={0} placeholder="0" style={{ width: '100%' }} />
-            </Form.Item>
-
-            <div className="add-page__row">
-              <Form.Item name="author_name" label="作者名" className="add-page__col">
+              <Form.Item name="up" label="份数">
+                <InputNumber min={0} placeholder="0" style={{ width: '100%' }} />
+              </Form.Item>
+              <RecipeSpecFields />
+              <Form.Item name="author_name" label="作者名">
                 <Input placeholder="请输入作者名" maxLength={50} showCount />
               </Form.Item>
-              <Form.Item
-                name="author_avatar"
-                label="作者头像 URL"
-                className="add-page__col"
-              >
+              <Form.Item name="author_avatar" label="作者头像 URL">
                 <Input placeholder="请输入作者头像 URL" maxLength={500} />
               </Form.Item>
+              <Form.Item
+                name="img"
+                label="封面图 URL"
+                rules={[{ required: true, message: '请输入封面图 URL' }]}
+              >
+                <Input placeholder="请输入封面图 URL" maxLength={500} showCount />
+              </Form.Item>
+              <Form.Item name="description" label="简介">
+                <Input.TextArea
+                  placeholder="请输入菜谱简介"
+                  rows={3}
+                  maxLength={500}
+                  showCount
+                />
+              </Form.Item>
+              <Form.Item name="tips" label="小贴士">
+                <Input.TextArea
+                  placeholder="请输入小贴士"
+                  rows={3}
+                  maxLength={500}
+                  showCount
+                />
+              </Form.Item>
             </div>
+          </section>
 
-            <Form.Item name="description" label="简介">
-              <Input.TextArea
-                placeholder="请输入菜谱简介"
-                rows={4}
-                maxLength={5000}
-                showCount
-              />
-            </Form.Item>
-
-            <Form.Item name="tips" label="小贴士">
-              <Input.TextArea
-                placeholder="请输入小贴士"
-                rows={2}
-                maxLength={500}
-                showCount
-              />
-            </Form.Item>
-          </Card>
-
-          <Card title="食材" className="add-page__section" size="small">
+          <section className="add-page__section">
+            <h3 className="add-page__heading">食材</h3>
             <Form.Item name="ingredients" rules={[ingredientsMinRule]}>
               <IngredientRows />
             </Form.Item>
-          </Card>
+          </section>
 
-          <Card title="制作步骤" className="add-page__section" size="small">
+          <section className="add-page__section">
+            <h3 className="add-page__heading">制作步骤</h3>
             <StepsFormList />
-          </Card>
+          </section>
         </Form>
       </div>
 
