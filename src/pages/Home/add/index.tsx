@@ -1,32 +1,29 @@
 import {
   Button,
+  Cascader,
+  Col,
   Form,
   Input,
   InputNumber,
+  Row,
+  Select,
   message,
 } from 'antd'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useQueryClient } from '@tanstack/react-query'
 import type { Rule } from 'antd/es/form'
 import PageToolbar from '@/components/PageToolbar'
 import { useCategoryTree } from '@/hooks/useCategoryTree'
 import { useCloseCurrentTag } from '@/hooks/useCloseCurrentTag'
+import { difficultyOptions } from '@/utils/difficulty'
 import IngredientRows from '../components/IngredientRows'
-import {
-  CategoryFormItem,
-  RecipeSpecFields,
-} from '../components/RecipeMetaFields'
 import StepsFormList from '../components/StepsFormList'
+import { categoryPathsMaxRule } from '../utils/categoryPath'
 import { createRecipe } from './api'
 import type { RecipeFormData, RecipeIngredient } from './model'
 import './index.scss'
 
-const INITIAL_VALUES: Partial<RecipeFormData> = {
-  ingredients: [],
-  steps: [{ text: '' }],
-  categoryPaths: [],
-}
+const COL_THIRD = { xs: 24, sm: 12, lg: 8 } as const
 
 const ingredientsMinRule: Rule = {
   validator: (_, value: RecipeIngredient[] | undefined) => {
@@ -41,7 +38,6 @@ const ingredientsMinRule: Rule = {
 
 export default function Add() {
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const closeCurrentTag = useCloseCurrentTag()
   const [form] = Form.useForm<RecipeFormData>()
   const [submitting, setSubmitting] = useState(false)
@@ -56,17 +52,9 @@ export default function Add() {
 
     setSubmitting(true)
     try {
-      const payload: RecipeFormData = {
-        ...values,
-        categoryPaths: values.categoryPaths ?? [],
-        ingredients: (values.ingredients ?? []).filter((item) => item.name.trim()),
-        steps: (values.steps ?? []).filter((step) => step.text.trim()),
-      }
-      await createRecipe(payload)
-      await queryClient.invalidateQueries({ queryKey: ['recipes'] })
-      await queryClient.invalidateQueries({ queryKey: ['ingredientNames'] })
+      await createRecipe(values)
       message.success('创建成功')
-      closeCurrentTag()
+      closeCurrentTag('reset')
     } catch {
       // 错误 toast 由拦截器统一处理
     } finally {
@@ -80,57 +68,117 @@ export default function Add() {
       <div className="add-page__scroll">
         <Form
           form={form}
-          layout="vertical"
-          initialValues={INITIAL_VALUES}
+          layout="horizontal"
+          labelAlign="right"
+          colon
+          labelCol={{ flex: '7em' }}
+          wrapperCol={{ flex: 1 }}
+          initialValues={{ steps: [{ text: '' }] }}
           className="add-page__form"
         >
           <section className="add-page__section">
             <h3 className="add-page__heading">基本信息</h3>
-            <div className="add-page__grid">
-              <Form.Item
-                name="title"
-                label="菜谱名称"
-                rules={[{ required: true, message: '请输入菜谱名称' }]}
-              >
-                <Input placeholder="请输入菜谱名称" maxLength={100} showCount />
-              </Form.Item>
-              <CategoryFormItem
-                categoryTree={categoryTree}
-                extra="可多选，最多 5 个"
-              />
-              <Form.Item name="up" label="份数">
-                <InputNumber min={0} placeholder="0" style={{ width: '100%' }} />
-              </Form.Item>
-              <RecipeSpecFields />
-              <Form.Item name="author_name" label="作者名">
-                <Input placeholder="请输入作者名" maxLength={50} showCount />
-              </Form.Item>
-              <Form.Item name="author_avatar" label="作者头像 URL">
-                <Input placeholder="请输入作者头像 URL" maxLength={500} />
-              </Form.Item>
-              <Form.Item
-                name="img"
-                label="封面图 URL"
-                rules={[{ required: true, message: '请输入封面图 URL' }]}
-              >
-                <Input placeholder="请输入封面图 URL" maxLength={500} showCount />
-              </Form.Item>
-              <Form.Item name="description" label="简介">
-                <Input.TextArea
-                  placeholder="请输入菜谱简介"
-                  rows={3}
-                  maxLength={500}
-                  showCount
-                />
-              </Form.Item>
-              <Form.Item name="tips" label="小贴士">
-                <Input.TextArea
-                  placeholder="请输入小贴士"
-                  rows={3}
-                  maxLength={500}
-                  showCount
-                />
-              </Form.Item>
+            <div className="add-page__fields">
+              <Row gutter={24}>
+                <Col {...COL_THIRD}>
+                  <Form.Item
+                    name="title"
+                    label="菜谱名称"
+                    rules={[{ required: true, message: '请输入菜谱名称' }]}
+                  >
+                    <Input placeholder="请输入菜谱名称" maxLength={100} />
+                  </Form.Item>
+                </Col>
+                <Col {...COL_THIRD}>
+                  <Form.Item
+                    name="categoryPaths"
+                    label="分类标签"
+                    rules={[categoryPathsMaxRule]}
+                  >
+                    <Cascader
+                      multiple
+                      options={categoryTree}
+                      showCheckedStrategy={Cascader.SHOW_CHILD}
+                      placeholder="可多选，最多 5 个"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col {...COL_THIRD}>
+                  <Form.Item name="up" label="份数">
+                    <InputNumber min={0} placeholder="请输入" />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={24}>
+                <Col {...COL_THIRD}>
+                  <Form.Item name="use_time" label="制作时间">
+                    <Input placeholder="如：30分钟" maxLength={50} />
+                  </Form.Item>
+                </Col>
+                <Col {...COL_THIRD}>
+                  <Form.Item name="difficulty" label="难度">
+                    <Select
+                      options={difficultyOptions}
+                      placeholder="请选择难度"
+                      allowClear
+                    />
+                  </Form.Item>
+                </Col>
+                <Col {...COL_THIRD}>
+                  <Form.Item name="ratio" label="步骤图比例">
+                    <Select
+                      allowClear
+                      options={[
+                      { value: '16/9', label: '16/9(横图)' },
+                      { value: '3/4', label: '3/4(竖图)' }]}
+                      placeholder="未选默认 16/9"
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={24}>
+                <Col {...COL_THIRD}>
+                  <Form.Item name="author_name" label="作者名">
+                    <Input placeholder="请输入作者名" maxLength={50} />
+                  </Form.Item>
+                </Col>
+                <Col {...COL_THIRD}>
+                  <Form.Item name="author_avatar" label="作者头像 URL">
+                    <Input placeholder="请输入作者头像 URL" maxLength={500} />
+                  </Form.Item>
+                </Col>
+                <Col {...COL_THIRD}>
+                  <Form.Item
+                    name="img"
+                    label="封面图 URL"
+                    rules={[{ required: true, message: '请输入封面图 URL' }]}
+                  >
+                    <Input placeholder="请输入封面图 URL" maxLength={500} />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={24}>
+                <Col {...COL_THIRD}>
+                  <Form.Item name="description" label="简介">
+                    <Input.TextArea
+                      placeholder="请输入菜谱简介"
+                      rows={3}
+                      maxLength={500}
+                      showCount
+                    />
+                  </Form.Item>
+                </Col>
+                <Col {...COL_THIRD}>
+                  <Form.Item name="tips" label="小贴士">
+                    <Input.TextArea
+                      placeholder="请输入小贴士"
+                      rows={3}
+                      maxLength={500}
+                      showCount
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
             </div>
           </section>
 

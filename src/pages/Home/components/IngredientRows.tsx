@@ -1,5 +1,5 @@
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Form, Input, Switch, Tooltip } from 'antd'
+import { Button, Col, Form, Input, Row, Switch, Tooltip } from 'antd'
 
 export interface RecipeIngredient {
   name: string
@@ -55,11 +55,11 @@ export default function IngredientRows() {
           添加食材
         </Button>
       </div>
-      <div className="ingredient-rows__list">
+      <Row gutter={[24, 8]}>
         {list.map((item, index) => {
           const isHeader = item.name.startsWith('#')
           return (
-            <div key={index} className="add-page__list-item">
+            <Col key={index} xs={24} sm={12} lg={8}>
               <div className="add-page__dynamic-row">
                 <Form.Item>
                   <Input
@@ -100,10 +100,10 @@ export default function IngredientRows() {
                   onClick={() => handleRemove(index)}
                 />
               </div>
-            </div>
+            </Col>
           )
         })}
-      </div>
+      </Row>
     </div>
   )
 }

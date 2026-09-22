@@ -1,17 +1,24 @@
 import { create } from 'zustand'
 import { type TagItem } from '@/router/routes'
 
+/** 关创建/编辑 Tab 后，列表 keep-alive 激活时要做的事 */
+export type ListReturnAction = 'reset' | 'refresh'
+
 interface TagsState {
   tags: TagItem[]
+  listReturnByPath: Record<string, ListReturnAction>
   addTag: (tag: TagItem) => void
   removeTag: (path: string) => TagItem | undefined
   setTags: (tags: TagItem[]) => void
   clearOtherTags: (path: string) => TagItem[]
   clearRightTags: (path: string) => TagItem[]
+  markListReturn: (listPath: string, action: ListReturnAction) => void
+  consumeListReturn: (listPath: string) => ListReturnAction | undefined
 }
 
 export const useTagsStore = create<TagsState>((set, get) => ({
   tags: [],
+  listReturnByPath: {},
 
   addTag: (tag) => {
     const { tags } = get()
@@ -32,6 +39,21 @@ export const useTagsStore = create<TagsState>((set, get) => ({
   },
 
   setTags: (tags) => set({ tags }),
+
+  markListReturn: (listPath, action) =>
+    set((s) => ({
+      listReturnByPath: { ...s.listReturnByPath, [listPath]: action },
+    })),
+
+  consumeListReturn: (listPath) => {
+    const { listReturnByPath } = get()
+    const action = listReturnByPath[listPath]
+    if (!action) return undefined
+    const next = { ...listReturnByPath }
+    delete next[listPath]
+    set({ listReturnByPath: next })
+    return action
+  },
 
   clearOtherTags: (path) => {
     const { tags } = get()

@@ -56,27 +56,20 @@
     }
   }
 
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    column-gap: 24px;
-    align-items: start;
-
-    @media (width <= 992px) {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+  &__fields {
+    .ant-form-item-label {
+      white-space: nowrap;
     }
 
-    @media (width <= 640px) {
-      grid-template-columns: 1fr;
+    .ant-form-item-control {
+      max-width: 230px;
     }
-  }
 
-  &__span-3 {
-    grid-column: 1 / -1;
-  }
-
-  &__list-item {
-    margin-bottom: 0;
+    .ant-select,
+    .ant-input-number,
+    .ant-cascader {
+      width: 100%;
+    }
   }
 
   &__dynamic-row {
@@ -138,22 +131,6 @@
 
 .ingredient-rows {
   &__toolbar {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    display: flex;
-    justify-content: flex-start;
     margin-bottom: 8px;
-    background: var(--ant-color-bg-container);
-  }
-
-  &__list {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-
-    @media (width >= 1200px) {
-      grid-template-columns: 1fr 1fr;
-    }
   }
 }

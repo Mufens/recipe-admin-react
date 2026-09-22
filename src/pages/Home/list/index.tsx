@@ -16,12 +16,14 @@ import {
 } from 'antd'
 import type { Dayjs } from 'dayjs'
 import { useMemo, useRef, useState, type Key } from 'react'
+import { useActivate } from 'react-activation'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import QueryFilter from '@/components/QueryFilter'
 import SmartTable from '@/components/SmartTable'
 import { type SmartColumn } from '@/components/TableToolbar'
 import { useCategoryTree } from '@/hooks/useCategoryTree'
+import { useTagsStore } from '@/store/tags'
 import { difficultyColor, difficultyOptions } from '@/utils/difficulty'
 import { imageProps, resolveMediaUrl } from '@/utils/media'
 import { resolvePathByTagId } from '../utils/categoryPath'
@@ -72,6 +74,7 @@ export default function Home() {
   const [createTimeRangeInput, setCreateTimeRangeInput] = useState<
     [Dayjs, Dayjs] | null
   >(null)
+  const [fetchNonce, setFetchNonce] = useState(0)
 
   const { data: categoryTree = [] } = useCategoryTree()
   const { data: ingredientOptions = [] } = useQuery({
@@ -115,6 +118,7 @@ export default function Home() {
       difficulty,
       createTimeFrom,
       createTimeTo,
+      fetchNonce,
     ],
     queryFn: ({ signal }) =>
       fetchRecipeList(
@@ -133,6 +137,7 @@ export default function Home() {
         signal,
       ),
   })
+
   const data = listData?.items ?? []
   const total = listData?.total ?? 0
 
@@ -171,6 +176,13 @@ export default function Home() {
     setPageSize(25)
     setSelectedRowKeys([])
   }
+
+  useActivate(() => {
+    const action = useTagsStore.getState().consumeListReturn('/recipe/list')
+    if (!action) return
+    if (action === 'reset') handleReset()
+    setFetchNonce((n) => n + 1)
+  })
 
   const handlePageChange = (p: number, ps: number) => {
     setPage(p)
