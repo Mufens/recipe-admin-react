@@ -8,7 +8,6 @@ type BuildColumnsOpts = {
   listKind: 'category' | 'sub_category' | 'tag'
   navigate: NavigateFunction
   selectNode: (next: NodeSel) => void
-  expandCategoryId: (categoryId: string) => void
   openRename: (row: ManageListItem) => void
   onDeleteTag: (id: number) => void
 }
@@ -17,7 +16,6 @@ export function buildCategoryColumns({
   listKind,
   navigate,
   selectNode,
-  expandCategoryId,
   openRename,
   onDeleteTag,
 }: BuildColumnsOpts): SmartColumn<ManageListItem>[] {
@@ -66,12 +64,8 @@ export function buildCategoryColumns({
             type="link"
             className="category-page__name-link"
             onClick={() => {
-              if (row.kind === 'category') {
-                selectNode({ kind: 'category', id: String(row.id) })
-                expandCategoryId(String(row.id))
-              } else if (row.kind === 'sub_category') {
-                selectNode({ kind: 'sub_category', id: String(row.id) })
-                if (row.parentId) expandCategoryId(row.parentId)
+              if (row.kind === 'category' || row.kind === 'sub_category') {
+                selectNode({ kind: row.kind, id: String(row.id) })
               }
             }}
           >
@@ -85,9 +79,8 @@ export function buildCategoryColumns({
       key: 'count',
       width: 100,
       render: (_: unknown, row) => {
-        if (listKind !== 'tag') return row.childCount ?? 0
-        const count = row.recipeCount ?? 0
-        if (count <= 0) return 0
+        const count = row.count ?? 0
+        if (listKind !== 'tag' || count <= 0) return count
         return (
           <Button
             type="link"

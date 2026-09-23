@@ -18,7 +18,6 @@ import { useCloseCurrentTag } from '@/hooks/useCloseCurrentTag'
 import { difficultyOptions } from '@/utils/difficulty'
 import IngredientRows from '../components/IngredientRows'
 import StepsFormList from '../components/StepsFormList'
-import { categoryPathsMaxRule } from '../utils/categoryPath'
 import { createRecipe } from './api'
 import type { RecipeFormData, RecipeIngredient } from './model'
 import './index.scss'
@@ -90,11 +89,7 @@ export default function Add() {
                   </Form.Item>
                 </Col>
                 <Col {...COL_THIRD}>
-                  <Form.Item
-                    name="categoryPaths"
-                    label="分类标签"
-                    rules={[categoryPathsMaxRule]}
-                  >
+                  <Form.Item name="categoryPaths" label="分类标签">
                     <Cascader
                       multiple
                       options={categoryTree}

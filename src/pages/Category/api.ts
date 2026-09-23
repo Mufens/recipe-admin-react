@@ -39,7 +39,12 @@ export function createTag(data: {
   type?: string
   icon?: string
 }) {
-  return request.post('/api/category/manage/tag', data)
+  return request.post<{
+    id: number
+    name: string
+    icon: string
+    type: string | null
+  }>('/api/category/manage/tag', data)
 }
 
 export function updateTag(data: {
@@ -49,6 +54,13 @@ export function updateTag(data: {
   icon?: string
 }) {
   return request.patch('/api/category/manage/tag', data)
+}
+
+/** 上传图标，返回 URL */
+export function uploadTagIcon(file: File) {
+  const form = new FormData()
+  form.append('icon', file)
+  return request.post<{ icon: string }>('/api/category/manage/tag/icon', form)
 }
 
 export function deleteTag(id: number) {

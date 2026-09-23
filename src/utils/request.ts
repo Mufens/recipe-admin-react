@@ -1,9 +1,5 @@
 import { message } from 'antd'
-import axios, {
-  type AxiosInstance,
-  type AxiosResponse,
-  type InternalAxiosRequestConfig,
-} from 'axios'
+import axios, { type AxiosInstance, type AxiosResponse } from 'axios'
 
 declare module 'axios' {
   export interface AxiosRequestConfig {
@@ -20,16 +16,6 @@ type DataRequest = {
 
 const instance: AxiosInstance = axios.create({
   timeout: 10000,
-  headers: { 'Content-Type': 'application/json' },
-})
-
-instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  // FormData 需由浏览器自动带 boundary，去掉默认 application/json
-  if (config.data instanceof FormData) {
-    delete config.headers['Content-Type']
-  }
-  // TODO: 注入 token
-  return config
 })
 
 instance.interceptors.response.use(

@@ -1,5 +1,4 @@
 import { Button, Input, Pagination, Space } from 'antd'
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import SmartTable from '@/components/SmartTable'
 import { buildCategoryColumns } from './columns'
@@ -11,23 +10,11 @@ import './index.scss'
 export default function CategoryPage() {
   const navigate = useNavigate()
   const m = useCategoryManage()
-  const [expandRequest, setExpandRequest] = useState<{
-    key: string
-    id: number
-  } | null>(null)
-
-  const expandCategoryId = (categoryId: string) => {
-    setExpandRequest((prev) => ({
-      key: categoryId,
-      id: (prev?.id ?? 0) + 1,
-    }))
-  }
 
   const columns = buildCategoryColumns({
     listKind: m.listKind,
     navigate,
     selectNode: m.selectNode,
-    expandCategoryId,
     openRename: m.openRename,
     onDeleteTag: m.deleteTag,
   })
@@ -39,9 +26,10 @@ export default function CategoryPage() {
         loading={m.navLoading}
         error={m.navError}
         selected={m.selected}
-        expandRequest={expandRequest}
+        expandedKeys={m.expandedKeys}
         onRetry={() => void m.refetchNav()}
         onSelect={m.selectNode}
+        onExpand={m.setExpandedKeys}
       />
 
       <section className="category-page__main">
@@ -57,13 +45,9 @@ export default function CategoryPage() {
                     className={active ? 'is-active' : undefined}
                     onClick={() => {
                       if (active) return
-                      const kind =
-                        b.kind === 'category' || b.kind === 'sub_category'
-                          ? b.kind
-                          : ''
                       m.selectNode({
-                        kind,
-                        id: kind ? b.id || '' : '',
+                        kind: b.kind,
+                        id: b.kind ? b.id : '',
                       })
                     }}
                   >

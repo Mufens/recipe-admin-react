@@ -1,5 +1,5 @@
 import { Button, Empty, Input, Spin, Tree, type TreeDataNode } from 'antd'
-import { useMemo, useState, type Key } from 'react'
+import { useMemo, useState } from 'react'
 import type { ManageNavNode, NodeKind, NodeSel } from '../model'
 
 type NavTreeNode = TreeDataNode & {
@@ -12,10 +12,10 @@ type Props = {
   loading: boolean
   error: boolean
   selected: NodeSel
-  /** 表格下钻时请求展开；id 递增以支持重复点同一节点 */
-  expandRequest?: { key: string; id: number } | null
+  expandedKeys: string[]
   onRetry: () => void
   onSelect: (next: NodeSel) => void
+  onExpand: (keys: string[]) => void
 }
 
 export default function CategoryNavTree({
@@ -23,13 +23,12 @@ export default function CategoryNavTree({
   loading,
   error,
   selected,
-  expandRequest = null,
+  expandedKeys,
   onRetry,
   onSelect,
+  onExpand,
 }: Props) {
   const [treeFilter, setTreeFilter] = useState('')
-  const [manualExpandedKeys, setManualExpandedKeys] = useState<Key[]>([])
-  const [appliedExpandId, setAppliedExpandId] = useState(0)
 
   const treeData: NavTreeNode[] = useMemo(() => {
     const kw = treeFilter.trim().toLowerCase()
@@ -39,7 +38,8 @@ export default function CategoryNavTree({
       id.toLowerCase().includes(kw)
 
     return nav.flatMap((cat) => {
-      const children = (cat.children || [])
+      const subs = cat.children || []
+      const children = subs
         .filter((sub) => match(sub.name, sub.id))
         .map(
           (sub): NavTreeNode => ({
@@ -54,37 +54,26 @@ export default function CategoryNavTree({
       const selfHit = match(cat.name, cat.id)
       if (!selfHit && children.length === 0 && kw) return []
 
+      const hasSubs = subs.length > 0
       return [
         {
           key: cat.id,
           title: cat.name,
           kind: 'category',
           id: cat.id,
-          children: cat.hasSubs ? children : undefined,
-          isLeaf: !cat.hasSubs,
+          children: hasSubs ? children : undefined,
+          isLeaf: !hasSubs,
         },
       ]
     })
   }, [nav, treeFilter])
 
   const filtering = !!treeFilter.trim()
-  const expandedKeys = filtering
+  const shownExpandedKeys = filtering
     ? treeData
         .filter((n) => Array.isArray(n.children) && n.children.length > 0)
-        .map((n) => n.key as Key)
-    : manualExpandedKeys
-
-  // 表格下钻展开：渲染期校正，避免 effect 内 setState
-  if (
-    expandRequest &&
-    expandRequest.id !== appliedExpandId &&
-    !filtering
-  ) {
-    setAppliedExpandId(expandRequest.id)
-    if (!manualExpandedKeys.includes(expandRequest.key)) {
-      setManualExpandedKeys([...manualExpandedKeys, expandRequest.key])
-    }
-  }
+        .map((n) => String(n.key))
+    : expandedKeys
 
   const selectedKeys =
     selected.kind && selected.id ? [selected.id] : []
@@ -121,9 +110,9 @@ export default function CategoryNavTree({
             blockNode
             treeData={treeData}
             selectedKeys={selectedKeys}
-            expandedKeys={expandedKeys}
+            expandedKeys={shownExpandedKeys}
             onExpand={(keys) => {
-              if (!filtering) setManualExpandedKeys(keys as Key[])
+              if (!filtering) onExpand(keys.map(String))
             }}
             onSelect={(keys, { node }) => {
               if (!keys.length) {

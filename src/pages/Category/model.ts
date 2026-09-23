@@ -1,5 +1,3 @@
-export type CategoryKind = 'category' | 'sub_category' | 'tag' | ''
-
 /** 左侧树可选中的节点（不含 tag） */
 export type NodeKind = 'category' | 'sub_category'
 
@@ -13,14 +11,9 @@ export const DEFAULT_PAGE_SIZE = 25
 export interface ManageNavNode {
   id: string
   name: string
-  kind: 'category'
-  hasSubs: boolean
-  childCount: number
   children: {
     id: string
     name: string
-    kind: 'sub_category'
-    leafCount: number
   }[]
 }
 
@@ -28,12 +21,10 @@ export interface ManageListItem {
   id: string | number
   name: string
   kind: 'category' | 'sub_category' | 'tag'
-  parentId: string | null
-  parentName: string
   type: string | null
   icon: string | null
-  childCount: number | null
-  recipeCount: number | null
+  /** 一级/二级为下级数量，标签为关联菜谱数 */
+  count: number
 }
 
 export interface ManageListResult {
@@ -42,7 +33,6 @@ export interface ManageListResult {
   page: number
   pageSize: number
   listKind: 'category' | 'sub_category' | 'tag'
-  breadcrumb: { id: string; name: string; kind: CategoryKind }[]
   canAddSub: boolean
   canAddTag: boolean
 }

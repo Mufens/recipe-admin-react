@@ -21,7 +21,7 @@ import { difficultyOptions } from '@/utils/difficulty'
 import { fetchRecipeDetail } from '../detail/api'
 import IngredientRows from '../components/IngredientRows'
 import StepsFormList from '../components/StepsFormList'
-import { categoryPathsMaxRule, resolveCategoryPaths } from '../utils/categoryPath'
+import { resolveCategoryPaths } from '../utils/categoryPath'
 import { updateRecipe } from './api'
 import type { RecipeEditFormData, RecipeIngredient } from './model'
 import '../add/index.scss'
@@ -177,11 +177,7 @@ export default function Edit() {
             <div className="add-page__fields">
               <Row gutter={24}>
                 <Col {...COL_THIRD}>
-                  <Form.Item
-                    name="categoryPaths"
-                    label="分类标签"
-                    rules={[categoryPathsMaxRule]}
-                  >
+                  <Form.Item name="categoryPaths" label="分类标签">
                     <Cascader
                       multiple
                       options={categoryTree}

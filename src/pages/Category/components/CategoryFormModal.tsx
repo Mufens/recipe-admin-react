@@ -1,5 +1,7 @@
 import { Form, Input, Modal, type FormInstance } from 'antd'
+import { useState } from 'react'
 import type { CategoryFormValues, ModalMode } from '../model'
+import TagIconUpload from './TagIconUpload.tsx'
 
 type Props = {
   modal: ModalMode
@@ -10,9 +12,16 @@ type Props = {
 }
 
 function modalTitle(modal: NonNullable<ModalMode>) {
-  if (modal.type === 'rename') return `修改「${modal.row.name}」`
+  if (modal.type === 'rename') return '修改'
   if (modal.type === 'createSub') return `在「${modal.parentName}」下加分组`
   return `往「${modal.parentName}」挂标签`
+}
+
+function sessionKeyOf(modal: ModalMode) {
+  if (!modal) return ''
+  if (modal.type === 'rename') return `r-${modal.kind}-${modal.row.id}`
+  if (modal.type === 'createTag') return `c-${modal.parentKind}-${modal.parentId}`
+  return `s-${modal.parentId}`
 }
 
 export default function CategoryFormModal({
@@ -22,6 +31,11 @@ export default function CategoryFormModal({
   onCancel,
   onOk,
 }: Props) {
+  const [iconUploading, setIconUploading] = useState(false)
+  const isTagForm =
+    modal?.type === 'createTag' ||
+    (modal?.type === 'rename' && modal.kind === 'tag')
+
   return (
     <Modal
       title={modal ? modalTitle(modal) : ''}
@@ -29,6 +43,7 @@ export default function CategoryFormModal({
       onCancel={onCancel}
       onOk={onOk}
       confirmLoading={confirmLoading}
+      okButtonProps={{ disabled: iconUploading }}
       destroyOnHidden
       okText="保存"
     >
@@ -54,16 +69,18 @@ export default function CategoryFormModal({
         >
           <Input placeholder="好认一点的名字" maxLength={50} />
         </Form.Item>
-        {(modal?.type === 'createTag' ||
-          (modal?.type === 'rename' && modal.kind === 'tag')) && (
-          <>
-            <Form.Item label="类型标记" name="type">
-              <Input placeholder="可选，如 popular / dessert" maxLength={50} />
-            </Form.Item>
-            <Form.Item label="图标 URL" name="icon">
-              <Input placeholder="可选，不填用默认图" maxLength={255} />
-            </Form.Item>
-          </>
+        {isTagForm && (
+          <Form.Item label="类型标记" name="type">
+            <Input placeholder="可选，如 popular / dessert" maxLength={50} />
+          </Form.Item>
+        )}
+        {isTagForm && (
+          <Form.Item label="分类封面" name="icon">
+            <TagIconUpload
+              key={sessionKeyOf(modal)}
+              onUploadingChange={setIconUploading}
+            />
+          </Form.Item>
         )}
       </Form>
     </Modal>

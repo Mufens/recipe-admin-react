@@ -22,20 +22,45 @@ import type {
   ManageListParams,
   ManageNavNode,
   ModalMode,
+  NodeKind,
   NodeSel,
 } from '../model'
 import { DEFAULT_PAGE_SIZE } from '../model'
 
-const ROOT_CRUMB = { id: '', name: '全部分类', kind: '' as const }
+type Crumb = {
+  id: string
+  name: string
+  kind: NodeSel['kind']
+}
 
-function isNodeInNav(nav: ManageNavNode[], selected: NodeSel): boolean {
-  if (!selected.kind || !selected.id) return true
+const ROOT_CRUMB: Crumb = { id: '', name: '全部分类', kind: '' }
+
+function buildBreadcrumb(nav: ManageNavNode[], selected: NodeSel): Crumb[] {
+  if (!selected.kind || !selected.id) return [ROOT_CRUMB]
   if (selected.kind === 'category') {
-    return nav.some((n) => n.id === selected.id)
+    const cat = nav.find((n) => n.id === selected.id)
+    return [
+      ROOT_CRUMB,
+      { id: selected.id, name: cat?.name || selected.id, kind: 'category' },
+    ]
   }
-  return nav.some((n) =>
-    (n.children || []).some((s) => s.id === selected.id),
-  )
+  for (const cat of nav) {
+    const sub = cat.children.find((s) => s.id === selected.id)
+    if (!sub) continue
+    return [
+      ROOT_CRUMB,
+      { id: cat.id, name: cat.name, kind: 'category' },
+      { id: sub.id, name: sub.name, kind: 'sub_category' },
+    ]
+  }
+  return [ROOT_CRUMB]
+}
+
+function expandKeyFor(nav: ManageNavNode[], next: NodeSel): string {
+  if (!next.id) return ''
+  if (next.kind === 'category') return next.id
+  const parent = nav.find((n) => n.children.some((s) => s.id === next.id))
+  return parent?.id ?? ''
 }
 
 const SAVE_MSG: Record<NonNullable<ModalMode>['type'], string> = {
@@ -47,19 +72,13 @@ const SAVE_MSG: Record<NonNullable<ModalMode>['type'], string> = {
 export function useCategoryManage() {
   const queryClient = useQueryClient()
   const [selected, setSelected] = useState<NodeSel>({ kind: '', id: '' })
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([])
   const [keywordInput, setKeywordInput] = useState('')
   const [keyword, setKeyword] = useState('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
   const [modal, setModal] = useState<ModalMode>(null)
   const [form] = Form.useForm<CategoryFormValues>()
-
-  const selectNode = (next: NodeSel) => {
-    setSelected(next)
-    setKeywordInput('')
-    setKeyword('')
-    setPage(1)
-  }
 
   const {
     data: nav = [],
@@ -71,9 +90,16 @@ export function useCategoryManage() {
     queryFn: ({ signal }) => fetchManageNav(signal),
   })
 
-  // nav 刷新后若选中已失效，在渲染期校正（避免 effect 内级联 setState）
-  if (!navLoading && !isNodeInNav(nav, selected)) {
-    selectNode({ kind: '', id: '' })
+  const selectNode = (next: NodeSel) => {
+    setSelected(next)
+    setKeywordInput('')
+    setKeyword('')
+    setPage(1)
+    const expandId = expandKeyFor(nav, next)
+    if (!expandId) return
+    setExpandedKeys((prev) =>
+      prev.includes(expandId) ? prev : [...prev, expandId],
+    )
   }
 
   const listParams: ManageListParams = {
@@ -95,17 +121,14 @@ export function useCategoryManage() {
   const listKind = listData?.listKind ?? 'category'
   const canAddSub = listData?.canAddSub ?? false
   const canAddTag = listData?.canAddTag ?? false
-  const breadcrumb = listData?.breadcrumb?.length
-    ? listData.breadcrumb
-    : [ROOT_CRUMB]
+  const breadcrumb = buildBreadcrumb(nav, selected)
 
-  const invalidateAll = async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['categoryManageNav'] }),
+  const refresh = (nav?: boolean) =>
+    Promise.all([
+      nav && queryClient.invalidateQueries({ queryKey: ['categoryManageNav'] }),
       queryClient.invalidateQueries({ queryKey: ['categoryManageList'] }),
       queryClient.invalidateQueries({ queryKey: ['categoryTree'] }),
     ])
-  }
 
   const saveMut = useMutation({
     mutationFn: async ({
@@ -150,15 +173,18 @@ export function useCategoryManage() {
     onSuccess: async (_data, { mode }) => {
       message.success(SAVE_MSG[mode.type])
       setModal(null)
-      await invalidateAll()
+      await refresh(
+        mode.type === 'createSub' ||
+          (mode.type === 'rename' && mode.kind !== 'tag'),
+      )
     },
   })
 
   const deleteMut = useMutation({
     mutationFn: (id: number) => deleteTag(id),
     onSuccess: async () => {
-      message.success('已删掉')
-      await invalidateAll()
+      message.success('删除成功')
+      await refresh()
     },
   })
 
@@ -167,7 +193,6 @@ export function useCategoryManage() {
   }
 
   const openCreateSub = () => {
-    if (selected.kind !== 'category' || !selected.id) return
     const cat = nav.find((n) => n.id === selected.id)
     setModal({
       type: 'createSub',
@@ -177,14 +202,11 @@ export function useCategoryManage() {
   }
 
   const openCreateTag = () => {
-    if (!selected.kind || !selected.id) return
-    const parentName =
-      breadcrumb.find((b) => b.id === selected.id)?.name || selected.id
     setModal({
       type: 'createTag',
-      parentKind: selected.kind,
+      parentKind: selected.kind as NodeKind,
       parentId: selected.id,
-      parentName,
+      parentName: breadcrumb[breadcrumb.length - 1].name,
     })
   }
 
@@ -208,7 +230,10 @@ export function useCategoryManage() {
   const handleModalOk = async () => {
     const values = await form.validateFields()
     if (!modal) return
-    await saveMut.mutateAsync({ mode: modal, values })
+    await saveMut.mutateAsync({
+      mode: modal,
+      values,
+    })
   }
 
   return {
@@ -218,6 +243,8 @@ export function useCategoryManage() {
     refetchNav,
     selected,
     selectNode,
+    expandedKeys,
+    setExpandedKeys,
     keywordInput,
     setKeywordInput,
     handleSearch: () => {
