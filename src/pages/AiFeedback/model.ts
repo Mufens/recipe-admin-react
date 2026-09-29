@@ -3,6 +3,7 @@ export const FEEDBACK_REASONS = [
   { code: 'ingredient_mismatch', label: '食材不匹配' },
   { code: 'dietary_conflict', label: '不符合忌口' },
   { code: 'inaccurate', label: '回答不准确' },
+  { code: 'other', label: '其他' },
 ] as const
 
 export type FeedbackReasonCode = (typeof FEEDBACK_REASONS)[number]['code']
