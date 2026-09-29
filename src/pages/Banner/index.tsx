@@ -12,20 +12,11 @@ import {
 } from './api'
 import {
   BANNER_QUERY_KEY,
-  LINK_TYPE_OPTIONS,
-  RANK_OPTIONS,
   needsFixedCovers,
   type BannerCover,
   type BannerItem,
 } from './model'
 import './index.scss'
-
-function labelOf(
-  options: readonly { value: string; label: string }[],
-  value?: string | null,
-) {
-  return options.find((o) => o.value === value)?.label ?? value ?? '-'
-}
 
 export default function BannerPage() {
   const pageRef = useRef<HTMLDivElement>(null)
@@ -150,21 +141,6 @@ export default function BannerPage() {
       dataIndex: 'cta',
       width: 110,
       render: (val: string | null) => val || '-',
-    },
-    {
-      title: '跳转',
-      key: 'link_type',
-      dataIndex: 'link_type',
-      width: 160,
-      render: (_: unknown, row: BannerItem) => {
-        const typeLabel = labelOf(LINK_TYPE_OPTIONS, row.link_type)
-        if (row.link_type === 'surprise') return typeLabel
-        const valueLabel =
-          row.link_type === 'rank'
-            ? labelOf(RANK_OPTIONS, row.link_value)
-            : row.link_value
-        return `${typeLabel} · ${valueLabel || '-'}`
-      },
     },
     {
       title: '启用',
