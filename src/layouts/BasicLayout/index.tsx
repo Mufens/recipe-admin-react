@@ -4,6 +4,7 @@ import {
   MenuUnfoldOutlined,
   PictureOutlined,
   TableOutlined,
+  DislikeOutlined,
   TeamOutlined,
   UnorderedListOutlined,
   UserOutlined,
@@ -41,6 +42,11 @@ const menuItems = [
     key: '/users',
     icon: <TeamOutlined />,
     label: '用户管理',
+  },
+  {
+    key: '/ai/feedback',
+    icon: <DislikeOutlined />,
+    label: '低满意问题榜',
   },
   {
     key: '/access',

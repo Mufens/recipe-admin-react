@@ -10,6 +10,7 @@ import Home from '@/pages/Home/list'
 import CategoryPage from '@/pages/Category'
 import BannerPage from '@/pages/Banner'
 import UserList from '@/pages/User/list'
+import AiFeedbackPage from '@/pages/AiFeedback'
 import TableDemo from '@/pages/Table'
 
 function KeepAliveRecipeList() {
@@ -47,6 +48,16 @@ function KeepAliveUsers() {
     <div style={{ height: '100%' }}>
       <KeepAlive name="/users">
         <UserList />
+      </KeepAlive>
+    </div>
+  )
+}
+
+function KeepAliveAiFeedback() {
+  return (
+    <div style={{ height: '100%' }}>
+      <KeepAlive name="/ai/feedback">
+        <AiFeedbackPage />
       </KeepAlive>
     </div>
   )
@@ -103,6 +114,7 @@ export default function AppRouter() {
         { path: 'categories', element: <KeepAliveCategories /> },
         { path: 'banners', element: <KeepAliveBanners /> },
         { path: 'users', element: <KeepAliveUsers /> },
+        { path: 'ai/feedback', element: <KeepAliveAiFeedback /> },
         { path: 'access', element: <Access /> },
         { path: 'table', element: <TableDemo /> },
       ],

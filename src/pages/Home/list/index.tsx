@@ -52,7 +52,7 @@ export default function Home() {
   const [importOpen, setImportOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(25)
+  const [pageSize, setPageSize] = useState(50)
   const [keyword, setKeyword] = useState('')
   const [keywordInput, setKeywordInput] = useState('')
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([])
@@ -72,7 +72,7 @@ export default function Home() {
   const [createTimeFrom, setCreateTimeFrom] = useState('')
   const [createTimeTo, setCreateTimeTo] = useState('')
   const [createTimeRangeInput, setCreateTimeRangeInput] = useState<
-    [Dayjs, Dayjs] | null
+    [Dayjs, Dayjs] |     null
   >(null)
   const [fetchNonce, setFetchNonce] = useState(0)
 
@@ -173,7 +173,7 @@ export default function Home() {
     setCreateTimeTo('')
     setCreateTimeRangeInput(null)
     setPage(1)
-    setPageSize(25)
+    setPageSize(50)
     setSelectedRowKeys([])
   }
 
@@ -183,11 +183,6 @@ export default function Home() {
     if (action === 'reset') handleReset()
     setFetchNonce((n) => n + 1)
   })
-
-  const handlePageChange = (p: number, ps: number) => {
-    setPage(p)
-    setPageSize(ps)
-  }
 
   const handleAdd = () => {
     navigate('/recipe/add')
@@ -537,10 +532,13 @@ export default function Home() {
               current={page}
               pageSize={pageSize}
               total={total}
-              pageSizeOptions={['25', '50', '100', '250']}
+              pageSizeOptions={['50', '100', '200', '500']}
               showSizeChanger
               showTotal={(t) => `共 ${t} 条`}
-              onChange={handlePageChange}
+              onChange={(nextPage, nextSize) => {
+                setPage(nextPage)
+                setPageSize(nextSize)
+              }}
             />
           }
           rowKey="id"
