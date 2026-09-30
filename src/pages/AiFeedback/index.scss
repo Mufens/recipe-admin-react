@@ -25,4 +25,16 @@
     min-height: 0;
     background: var(--ant-color-bg-container);
   }
+
+  &__votes {
+    display: inline-flex;
+    gap: 12px;
+    align-items: center;
+    color: var(--ant-color-text-quaternary);
+    font-size: 16px;
+  }
+
+  &__vote--on {
+    color: var(--ant-color-primary);
+  }
 }

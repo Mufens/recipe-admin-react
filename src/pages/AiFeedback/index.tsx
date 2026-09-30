@@ -1,3 +1,9 @@
+import {
+  DislikeFilled,
+  DislikeOutlined,
+  LikeFilled,
+  LikeOutlined,
+} from '@ant-design/icons'
 import { Form, Input, Pagination, Select, Space, Button } from 'antd'
 import dayjs from 'dayjs'
 import { useMemo, useRef, useState } from 'react'
@@ -11,14 +17,6 @@ import {
   type LowSatisfactionItem,
 } from './model'
 import './index.scss'
-
-const QUESTION_TYPE_LABEL: Record<string, string> = {
-  recipe: '菜谱',
-  health: '饮食',
-  flavor: '口味',
-  leftovers: '手头食材',
-  favorites: '收藏推荐',
-}
 
 function formatTime(val: string | null) {
   if (!val) return '-'
@@ -73,47 +71,56 @@ export default function AiFeedbackPage() {
         key: 'questionType',
         dataIndex: 'questionType',
         width: 100,
-        render: (val: string) => QUESTION_TYPE_LABEL[val] || val || '-',
+        render: (val: string) => val || '-',
       },
       {
-        title: '踩',
-        key: 'downCount',
-        dataIndex: 'downCount',
-        width: 72,
+        title: '评价',
+        key: 'vote',
+        dataIndex: 'vote',
+        width: 88,
+        render: (vote: LowSatisfactionItem['vote']) => (
+          <span className="ai-feedback-page__votes">
+            {vote === 'up' ? (
+              <LikeFilled className="ai-feedback-page__vote--on" />
+            ) : (
+              <LikeOutlined />
+            )}
+            {vote === 'down' ? (
+              <DislikeFilled className="ai-feedback-page__vote--on" />
+            ) : (
+              <DislikeOutlined />
+            )}
+          </span>
+        ),
       },
       {
-        title: '赞',
-        key: 'upCount',
-        dataIndex: 'upCount',
-        width: 72,
+        title: '原因',
+        key: 'reason',
+        dataIndex: 'reason',
+        width: 220,
+        ellipsis: true,
+        render: (val: string) => val || '-',
       },
-      ...FEEDBACK_REASONS.map((item) => ({
-        title: item.label,
-        key: item.code,
-        width: 120,
-        render: (_: unknown, row: LowSatisfactionItem) =>
-          row.reasons?.[item.code] ?? 0,
-      })),
       {
         title: '最近回答',
-        key: 'latestAnswer',
-        dataIndex: 'latestAnswer',
+        key: 'answer',
+        dataIndex: 'answer',
         width: 280,
         ellipsis: true,
         render: (val: string) => val || '-',
       },
       {
         title: '补充说明',
-        key: 'latestNote',
-        dataIndex: 'latestNote',
+        key: 'note',
+        dataIndex: 'note',
         width: 180,
         ellipsis: true,
         render: (val: string) => val || '-',
       },
       {
         title: '最近反馈',
-        key: 'lastFeedbackAt',
-        dataIndex: 'lastFeedbackAt',
+        key: 'feedbackAt',
+        dataIndex: 'feedbackAt',
         width: 160,
         render: (val: string | null) => formatTime(val),
       },
@@ -165,7 +172,7 @@ export default function AiFeedbackPage() {
           tableToolbar={{
             loading,
             onReload: () => void refetch(),
-            storageKey: 'ai-feedback',
+            storageKey: 'ai-feedback-rank',
             fullscreenTargetRef: pageRef,
           }}
           paginationNode={
@@ -182,7 +189,7 @@ export default function AiFeedbackPage() {
               }}
             />
           }
-          rowKey={(row) => `${row.questionType}:${row.question}`}
+          rowKey="id"
           columns={columns}
           dataSource={data}
           loading={loading}

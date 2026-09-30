@@ -9,14 +9,14 @@ export const FEEDBACK_REASONS = [
 export type FeedbackReasonCode = (typeof FEEDBACK_REASONS)[number]['code']
 
 export interface LowSatisfactionItem {
+  id: number
   question: string
   questionType: string
-  downCount: number
-  upCount: number
-  reasons: Record<FeedbackReasonCode, number>
-  latestAnswer: string
-  latestNote: string
-  lastFeedbackAt: string | null
+  vote: 'up' | 'down'
+  reason: string
+  answer: string
+  note: string
+  feedbackAt: string | null
 }
 
 export interface LowSatisfactionResult {
